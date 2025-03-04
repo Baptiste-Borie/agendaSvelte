@@ -5,6 +5,8 @@
   import { format, addMonths, subMonths } from "date-fns";
   import { fr } from "date-fns/locale";
 
+
+
   let currentDate = new Date();
 
   $: currentMonth = format(currentDate, "MMMM-yyyy", { locale: fr });
