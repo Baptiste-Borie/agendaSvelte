@@ -12,9 +12,6 @@
     endOfWeek,
   } from "date-fns";
   import { fr } from "date-fns/locale";
-
-
-
   let currentDate = new Date();
   let currentView = "month";
   let currentPage = "login";
@@ -168,5 +165,10 @@
   img {
     width: 30px;
     height: 30px;
+  }
+
+  .button_event{
+    border-radius: 5px;
+    background-color: rgb(97, 96, 96);
   }
 </style>
