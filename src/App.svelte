@@ -4,6 +4,7 @@
   import chevronNext from "./assets/next.png";
   import Login from "./lib/Login.svelte";
   import Week from "./lib/Week.svelte";
+  import SideBarEvents from "./lib/SideBarEvents.svelte";
   import {
     format,
     addMonths,
@@ -13,9 +14,12 @@
   } from "date-fns";
   import { fr } from "date-fns/locale";
 
+
+
   let currentDate = new Date();
   let currentView = "month";
   let currentPage = "login";
+  let isOpen = false; //sidebar
 
   $: currentMonth = format(currentDate, "MMMM-yyyy", { locale: fr });
   $: currentMonthLabel = format(currentDate, "MMMM yyyy", { locale: fr });
@@ -64,7 +68,16 @@
       switchToMonthView();
     }
   }
+
+  function toggleSidebar() {
+        isOpen = !isOpen;
+  }
 </script>
+<!-- 
+<main>
+  <button on:click={toggleSidebar}>Open SideBar</button>
+  <SideBarEvents {isOpen}/>
+</main> -->
 
 <nav>
   {#if loggedInUser}
@@ -73,7 +86,12 @@
     <button onclick={() => navigate("login")}>Connexion</button>
   {/if}
   <button onclick={() => navigate("agenda")}>Agenda</button>
+  {#if loggedInUser}
+  <button onclick={toggleSidebar}>Créer un Evenement</button>
+  {/if}
 </nav>
+
+
 
 <main>
   {#if currentPage === "login"}
@@ -119,6 +137,7 @@
       {/key}
     {/if}
   {/if}
+  <SideBarEvents {isOpen}></SideBarEvents>
 </main>
 
 <style>
