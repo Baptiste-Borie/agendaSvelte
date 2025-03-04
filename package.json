@@ -14,7 +14,8 @@
     "vite": "^6.2.0"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.2",
     "date-fns": "^4.1.0",
-    "locale": "^0.1.0"
+    "dexie": "^4.0.11"
   }
 }
