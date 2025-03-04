@@ -13,6 +13,8 @@
   } from "date-fns";
   import { fr } from "date-fns/locale";
 
+
+
   let currentDate = new Date();
   let currentView = "month";
   let currentPage = "login";
