@@ -1,10 +1,18 @@
 <script>
   import { format } from "date-fns";
   import db from "./db.js";
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, onMount } from "svelte";
+  
 
+  export let loggedInUser; 
   export let fetchEvents;
   export let isOpen;
+
+  onMount(() => {
+        if (loggedInUser) {
+            userID= loggedInUser.id;
+        }
+    });
 
   let eventName = "";
   let eventDate = null;
@@ -12,7 +20,7 @@
   let hour_end = "";
   let description = "";
   let color = "";
-  let userID = sessionStorage.getItem("userID");
+  let userID ="";
 
   const dispatch = createEventDispatcher(); // Création du dispatcher
 

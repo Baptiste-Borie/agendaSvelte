@@ -160,7 +160,7 @@
     <Profile {loggedInUser} />
   {/if}
   {#key loggedInUser}
-    <SideBarEvents bind:isOpen={isSidebarOpen} {fetchEvents}></SideBarEvents>
+    <SideBarEvents bind:isOpen={isSidebarOpen} {fetchEvents} {loggedInUser}></SideBarEvents>
   {/key}
 </main>
 
