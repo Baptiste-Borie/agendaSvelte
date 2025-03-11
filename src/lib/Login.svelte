@@ -44,8 +44,7 @@
                 error = '';
                 console.log('Connexion réussie:', loggedInUser);
                 onLogin(loggedInUser);
-                // Pour associer l'id du user à l'event
-                sessionStorage.setItem('userID', user.id);
+
             } else {
                 error = 'Email ou mot de passe incorrect';
             }
