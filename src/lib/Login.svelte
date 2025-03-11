@@ -13,6 +13,7 @@
     let loggedInUser = null;
     let isRegistering = false;
 
+
     // Fonction pour hasher les mdp
     async function hashPassword(password) {
         const salt = await bcrypt.genSalt(10);
@@ -33,6 +34,8 @@
                 error = '';
                 console.log('Connexion réussie:', loggedInUser);
                 onLogin(loggedInUser);
+                // Pour associer l'id du user à l'event
+                sessionStorage.setItem('userID', user.id);
             } else {
                 error = 'Email ou mot de passe incorrect';
             }
