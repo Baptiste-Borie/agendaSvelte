@@ -80,6 +80,10 @@
     }
   }
 
+  function handleSidebarClose() {
+    isSidebarOpen = false;
+  }
+
   async function fetchEvents() {
     try {
       const eventsData = await db.events.toArray();
@@ -160,7 +164,7 @@
     <Profile {loggedInUser} />
   {/if}
   {#key loggedInUser}
-    <SideBarEvents bind:isOpen={isSidebarOpen} {fetchEvents} {loggedInUser}></SideBarEvents>
+    <SideBarEvents bind:isOpen={isSidebarOpen} {fetchEvents} {loggedInUser} onClose={handleSidebarClose}></SideBarEvents>
   {/key}
 </main>
 

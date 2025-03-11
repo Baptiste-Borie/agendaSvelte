@@ -1,13 +1,13 @@
 <script>
   import { format } from "date-fns";
   import db from "./db.js";
-  import { createEventDispatcher, onMount } from "svelte";
+  import {onMount } from "svelte";
   
 
   export let loggedInUser; 
   export let fetchEvents;
   export let isOpen;
-
+  export let onClose;
   onMount(() => {
         if (loggedInUser) {
             userID= loggedInUser.id;
@@ -22,11 +22,12 @@
   let color = "";
   let userID ="";
 
-  const dispatch = createEventDispatcher(); // Création du dispatcher
+  // const dispatch = createEventDispatcher(); // Création du dispatcher
 
   function closeSideBar() {
     isOpen = false;
-    dispatch("close");
+    onClose();
+    // dispatch("close");
   }
 
   function clearAllFields() {
