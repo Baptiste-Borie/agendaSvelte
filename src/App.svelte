@@ -171,7 +171,13 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    color: black;
   }
+
+  button {
+    color: black;
+  }
+
   .header {
     display: flex;
     justify-content: space-between;
