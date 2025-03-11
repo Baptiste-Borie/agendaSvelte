@@ -19,7 +19,7 @@
   let currentDate = new Date();
   let currentView = "month";
   let currentPage = "login";
-  let isOpen = false; //sidebar
+  let isSidebarOpen = false;
 
   $: currentMonth = format(currentDate, "MMMM-yyyy", { locale: fr });
   $: currentMonthLabel = format(currentDate, "MMMM yyyy", { locale: fr });
@@ -56,7 +56,6 @@
   function nextMonth() {
     currentDate = addMonths(currentDate, 1);
   }
-
   $: startOfCurrentWeek = startOfWeek(currentDate, { weekStartsOn: 1 });
   $: endOfCurrentWeek = endOfWeek(currentDate, { weekStartsOn: 1 });
 
@@ -68,16 +67,7 @@
       switchToMonthView();
     }
   }
-
-  function toggleSidebar() {
-        isOpen = !isOpen;
-  }
 </script>
-<!-- 
-<main>
-  <button on:click={toggleSidebar}>Open SideBar</button>
-  <SideBarEvents {isOpen}/>
-</main> -->
 
 <nav>
   {#if loggedInUser}
@@ -87,7 +77,7 @@
   {/if}
   <button onclick={() => navigate("agenda")}>Agenda</button>
   {#if loggedInUser}
-  <button onclick={toggleSidebar}>Créer un Evenement</button>
+  <button onclick={() => isSidebarOpen = !isSidebarOpen}>Créer un Evenement</button>
   {/if}
 </nav>
 
@@ -137,7 +127,7 @@
       {/key}
     {/if}
   {/if}
-  <SideBarEvents {isOpen}></SideBarEvents>
+  <SideBarEvents  bind:isOpen={isSidebarOpen}></SideBarEvents>
 </main>
 
 <style>
