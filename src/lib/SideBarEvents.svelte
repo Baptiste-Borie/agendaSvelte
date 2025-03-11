@@ -1,13 +1,15 @@
 <script>
   import { format } from "date-fns";
   import db from "./db.js";
-  import { createEventDispatcher, onMount } from "svelte";
+  import { onMount } from "svelte";
   
 
   export let loggedInUser; 
   export let fetchEvents;
   export let isOpen;
-
+  export let onClose;
+  export let selectedDate;
+  export let isEditing; 
   onMount(() => {
         if (loggedInUser) {
             userID= loggedInUser.id;
@@ -22,11 +24,10 @@
   let color = "";
   let userID ="";
 
-  const dispatch = createEventDispatcher(); // Création du dispatcher
-
   function closeSideBar() {
     isOpen = false;
-    dispatch("close");
+    isEditing = false;
+    onClose();
   }
 
   function clearAllFields() {
@@ -66,6 +67,7 @@
         });
         fetchEvents();
         clearAllFields();
+        isEditing = false;
       } else {
         alert(
           "Veuillez choisir au moins une Date et un titre pour votre événement  !"
@@ -80,7 +82,7 @@
 
 {#if isOpen}
   <div class="sidenav">
-    <button on:click={closeSideBar} class="close-btn">X</button>
+    <button onclick={closeSideBar} class="close-btn">X</button>
 
     <h2>Créez votre prochain événement</h2>
 
@@ -146,7 +148,9 @@
         class="input-field"
       />
     </div>
-    <button on:click={createEvent} class="submit-btn">Créer l'événement</button>
+    <button onclick={createEvent} class="submit-btn">
+      Créer l'événement
+    </button>
   </div>
 {/if}
 

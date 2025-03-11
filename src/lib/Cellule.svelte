@@ -3,7 +3,7 @@
   export let today;
   export let view;
   export let events = [];
-
+  export let onCellClick; 
   let isModalOpen = false;
   let selectedEvent = null;
 
@@ -29,11 +29,23 @@
     const options = { weekday: "long", day: "numeric", month: "long" };
     return new Intl.DateTimeFormat("fr-FR", options).format(date);
   };
+
+  function handleClick() {
+    onCellClick({date})
+  }
+
+  function handleKeydown(event) {
+    // Permet d'activer l'élément avec la touche "Entrée" ou "Espace"
+    if (event.key === "Enter" || event.key === " ") {
+      handleClick();
+    }
+  }
 </script>
 
-<div class={"cellule " + (isWeekView ? "week" : "month")}>
+
+<div class={"cellule " + (isWeekView ? "week" : "month")} onclick={handleClick} onkeydown={handleKeydown}  tabindex="0" role="button"> 
   {#if date}
-    <span class={isToday(date) ? "today" : ""}>{date.getDate()}</span>
+    <span class={isToday(date) ? "today" : ""} >{date.getDate()}</span>
   {/if}
 
   {#if events.length > 0}
@@ -42,7 +54,7 @@
         <button
           class="event"
           style="background-color: {event.color}"
-          on:click={(e) => {
+          onclick={(e) => {
             e.stopPropagation();
             openModal(event);
           }}
@@ -57,7 +69,7 @@
 {#if isModalOpen}
   <div class="modal">
     <div class="modal-content">
-      <button class="close" on:click={closeModal}>×</button>
+      <button class="close" onclick={closeModal}>×</button>
       <div>
         <h2>{selectedEvent.eventName}</h2>
         <div class="tempo">
@@ -69,6 +81,10 @@
         </div>
         <hr />
         <p>{selectedEvent.description}</p>
+        <button onclick={(e) => {
+          handleClick();
+          closeModal();
+        }}> Modifier</button>
       </div>
     </div>
   </div>

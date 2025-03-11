@@ -21,7 +21,8 @@
   let currentView = "month";
   let currentPage = "login";
   let isSidebarOpen = false;
-
+  let selectedDate = null;
+  let isEditing = false;
   let events = [];
 
   $: currentMonth = format(currentDate, "MMMM-yyyy", { locale: fr });
@@ -80,6 +81,20 @@
     }
   }
 
+  function handleSidebarClose() {
+    isSidebarOpen = false;
+  }
+  
+  function handleButtonSidebarClose(action){
+    handleSidebarClose();
+    action();
+  }
+
+  function handleCellClick(event) {
+    selectedDate = event.date;
+    isSidebarOpen = true;
+  }
+
   async function fetchEvents() {
     try {
       const eventsData = await db.events.toArray();
@@ -90,21 +105,15 @@
   }
 </script>
 
-<!-- 
-  <main>
-    <button on:click={toggleSidebar}>Open SideBar</button>
-    <SideBarEvents {isOpen}/>
-  </main> -->
-
 <nav>
   {#if loggedInUser}
-    <button onclick={handleLogout}>Déconnexion</button>
+    <button onclick={() => handleButtonSidebarClose(handleLogout)}>Déconnexion</button>
     {#if currentPage !== "profile"}
       <button onclick={() => (isSidebarOpen = !isSidebarOpen)}
         >Créer un Evenement
       </button>
     {/if}
-    <button onclick={() => navigate("profile")}>Modifier mon profil</button>
+    <button onclick={() => handleButtonSidebarClose(() => navigate("profile"))}>Modifier mon profil</button>
   {:else}
     <button onclick={() => navigate("login")}>Connexion</button>
   {/if}
@@ -149,18 +158,18 @@
 
     {#if currentView === "month"}
       {#key currentMonth}
-        <Month {currentMonth} {events} />
+        <Month {currentMonth} {events} onCellClick={handleCellClick}/>
       {/key}
     {:else if currentView === "week"}
       {#key startOfCurrentWeek}
-        <Week {startOfCurrentWeek} {events} />
+        <Week {startOfCurrentWeek} {events} onCellClick={handleCellClick}/>
       {/key}
     {/if}
   {:else if currentPage === "profile"}
     <Profile {loggedInUser} />
   {/if}
   {#key loggedInUser}
-    <SideBarEvents bind:isOpen={isSidebarOpen} {fetchEvents} {loggedInUser}></SideBarEvents>
+    <SideBarEvents bind:isOpen={isSidebarOpen} {fetchEvents} {loggedInUser} onClose={handleSidebarClose} {selectedDate} {isEditing}></SideBarEvents>
   {/key}
 </main>
 
