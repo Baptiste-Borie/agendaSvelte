@@ -81,6 +81,10 @@
         </div>
         <hr />
         <p>{selectedEvent.description}</p>
+        <button onclick={(e) => {
+          handleClick();
+          closeModal();
+        }}> Modifier</button>
       </div>
     </div>
   </div>

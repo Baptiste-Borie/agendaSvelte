@@ -22,7 +22,7 @@
   let currentPage = "login";
   let isSidebarOpen = false;
   let selectedDate = null;
-
+  let isEditing = false;
   let events = [];
 
   $: currentMonth = format(currentDate, "MMMM-yyyy", { locale: fr });
@@ -85,6 +85,11 @@
     isSidebarOpen = false;
   }
   
+  function handleButtonSidebarClose(action){
+    handleSidebarClose();
+    action();
+  }
+
   function handleCellClick(event) {
     selectedDate = event.date;
     isSidebarOpen = true;
@@ -100,21 +105,15 @@
   }
 </script>
 
-<!-- 
-  <main>
-    <button on:click={toggleSidebar}>Open SideBar</button>
-    <SideBarEvents {isOpen}/>
-  </main> -->
-
 <nav>
   {#if loggedInUser}
-    <button onclick={handleLogout}>Déconnexion</button>
+    <button onclick={() => handleButtonSidebarClose(handleLogout)}>Déconnexion</button>
     {#if currentPage !== "profile"}
       <button onclick={() => (isSidebarOpen = !isSidebarOpen)}
         >Créer un Evenement
       </button>
     {/if}
-    <button onclick={() => navigate("profile")}>Modifier mon profil</button>
+    <button onclick={() => handleButtonSidebarClose(() => navigate("profile"))}>Modifier mon profil</button>
   {:else}
     <button onclick={() => navigate("login")}>Connexion</button>
   {/if}
@@ -170,7 +169,7 @@
     <Profile {loggedInUser} />
   {/if}
   {#key loggedInUser}
-    <SideBarEvents bind:isOpen={isSidebarOpen} {fetchEvents} {loggedInUser} onClose={handleSidebarClose}></SideBarEvents>
+    <SideBarEvents bind:isOpen={isSidebarOpen} {fetchEvents} {loggedInUser} onClose={handleSidebarClose} {selectedDate} {isEditing}></SideBarEvents>
   {/key}
 </main>
 
