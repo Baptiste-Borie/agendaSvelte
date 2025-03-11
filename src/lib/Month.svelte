@@ -11,6 +11,7 @@
 
   export let currentMonth;
   export let events = [];
+  export let onCellClick;
 
   let parsedDate = parse(currentMonth, "MMMM-yyyy", new Date(), { locale: fr });
   let firstDayOfMonth = startOfMonth(parsedDate);
@@ -35,7 +36,7 @@
     <div class="header">{head}</div>
   {/each}
   {#each days as day}
-    <Cellule date={day} {today} view={"Month"} events={getEventsForDay(day)} />
+    <Cellule date={day} {today} view={"Month"} events={getEventsForDay(day)} onCellClick={onCellClick} />
   {/each}
 </div>
 

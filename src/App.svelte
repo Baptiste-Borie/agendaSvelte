@@ -21,6 +21,7 @@
   let currentView = "month";
   let currentPage = "login";
   let isSidebarOpen = false;
+  let selectedDate = null;
 
   let events = [];
 
@@ -82,6 +83,11 @@
 
   function handleSidebarClose() {
     isSidebarOpen = false;
+  }
+  
+  function handleCellClick(event) {
+    selectedDate = event.date;
+    isSidebarOpen = true;
   }
 
   async function fetchEvents() {
@@ -153,11 +159,11 @@
 
     {#if currentView === "month"}
       {#key currentMonth}
-        <Month {currentMonth} {events} />
+        <Month {currentMonth} {events} onCellClick={handleCellClick}/>
       {/key}
     {:else if currentView === "week"}
       {#key startOfCurrentWeek}
-        <Week {startOfCurrentWeek} {events} />
+        <Week {startOfCurrentWeek} {events} onCellClick={handleCellClick}/>
       {/key}
     {/if}
   {:else if currentPage === "profile"}
