@@ -25,7 +25,7 @@
 
   function getEventsForDay(day) {
     return events.filter((event) =>
-      isSameDay(day, parse(event.date, "yyyy-MM-dd", new Date()))
+      isSameDay(day, parse(event.eventDate, "yyyy-MM-dd", new Date()))
     );
   }
 </script>

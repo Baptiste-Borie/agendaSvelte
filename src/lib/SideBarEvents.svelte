@@ -1,9 +1,9 @@
 <script>
-  import { Datepicker } from "svelte-calendar";
   import { format } from "date-fns";
   import db from "./db.js";
   import { createEventDispatcher } from "svelte";
 
+  export let fetchEvents;
   export let isOpen;
   let eventName = "";
   let eventDate = null;
@@ -55,6 +55,7 @@
           color: finalColor,
           userID,
         });
+        fetchEvents();
         clearAllFields();
       } else {
         alert(

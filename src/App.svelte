@@ -1,119 +1,93 @@
 <script>
-    import Month from "./lib/Month.svelte";
-    import chevronBack from "./assets/back.png";
-    import chevronNext from "./assets/next.png";
-    import Login from "./lib/Login.svelte";
-    import Week from "./lib/Week.svelte";
-    import SideBarEvents from "./lib/SideBarEvents.svelte";
-    import UserProfile from './lib/UserProfile.svelte';
-    import {
-        format,
-        addMonths,
-        subMonths,
-        startOfWeek,
-        subWeeks,
-        addWeeks,
-    } from "date-fns";
-    import {fr} from "date-fns/locale";
+  import Month from "./lib/Month.svelte";
+  import chevronBack from "./assets/back.png";
+  import chevronNext from "./assets/next.png";
+  import db from "./lib/db.js";
+  import Login from "./lib/Login.svelte";
+  import Week from "./lib/Week.svelte";
+  import SideBarEvents from "./lib/SideBarEvents.svelte";
+  import {
+    format,
+    addMonths,
+    subMonths,
+    startOfWeek,
+    subWeeks,
+    addWeeks,
+  } from "date-fns";
+  import { fr } from "date-fns/locale";
 
     let currentDate = new Date();
     let currentView = "month";
     let currentPage = "login";
     let isSidebarOpen = false;
 
-    let events = [
-        {
-            event_name: "Event 1",
-            description: "Event 1 description",
-            date: "2025-03-11",
-            time_start: "01:30",
-            time_end: "10:30",
-        },
-        {
-            event_name: "Event 2",
-            description: "Event 2 description",
-            date: "2025-03-11",
-            time_start: "09:30",
-            time_end: "10:30",
-        },
-        {
-            event_name: "Event 2",
-            description: "Event 2 description",
-            date: "2025-03-11",
-            time_start: "09:30",
-            time_end: "10:30",
-        },
-        {
-            event_name: "Event 2",
-            description: "Event 2 description",
-            date: "2025-03-11",
-            time_start: "09:30",
-            time_end: "10:30",
-        },
-        {
-            event_name: "Event 3",
-            description: "Event 3 description",
-            date: "2025-04-11",
-            time_start: "09:30",
-            time_end: "10:30",
-        },
-    ];
+  let events = [];
 
     $: currentMonth = format(currentDate, "MMMM-yyyy", {locale: fr});
     $: currentMonthLabel = format(currentDate, "MMMM yyyy", {locale: fr});
 
     let loggedInUser = null;
 
-    function navigate(page) {
-        currentPage = page;
-    }
+  function navigate(page) {
+    currentPage = page;
+  }
 
-    function handleLogin(user) {
-        loggedInUser = user;
-        navigate("agenda");
-    }
+  function handleLogin(user) {
+    loggedInUser = user;
+    navigate("agenda");
+    fetchEvents();
+  }
 
-    // Fonction pour gérer la déconnexion
-    function handleLogout() {
-        loggedInUser = null;
-        console.log("deco");
-        navigate("login");
-    }
+  // Fonction pour gérer la déconnexion
+  function handleLogout() {
+    loggedInUser = null;
+    console.log("deco");
+    navigate("login");
+  }
+  function switchToMonthView() {
+    currentView = "month";
+  }
 
-    function switchToMonthView() {
-        currentView = "month";
-    }
+  function switchToWeekView() {
+    currentView = "week";
+  }
 
-    function switchToWeekView() {
-        currentView = "week";
-    }
+  function previousMonth() {
+    currentDate = subMonths(currentDate, 1);
+  }
 
-    function previousMonth() {
-        currentDate = subMonths(currentDate, 1);
-    }
+  function nextMonth() {
+    currentDate = addMonths(currentDate, 1);
+  }
 
-    function nextMonth() {
-        currentDate = addMonths(currentDate, 1);
-    }
+  function previousWeek() {
+    currentDate = subWeeks(currentDate, 1);
+  }
 
-    function previousWeek() {
-        currentDate = subWeeks(currentDate, 1);
-    }
+  function nextWeek() {
+    currentDate = addWeeks(currentDate, 1);
+  }
 
-    function nextWeek() {
-        currentDate = addWeeks(currentDate, 1);
-    }
+  $: startOfCurrentWeek = startOfWeek(currentDate, { weekStartsOn: 1 });
 
-    $: startOfCurrentWeek = startOfWeek(currentDate, {weekStartsOn: 1});
-
-    function handleInputChange(event) {
-        const input = event.target.value.toLowerCase();
-        if (input.includes("semaine")) {
-            switchToWeekView();
-        } else if (input.includes("mois")) {
-            switchToMonthView();
-        }
+  function handleInputChange(event) {
+    const input = event.target.value.toLowerCase();
+    if (input.includes("semaine")) {
+      switchToWeekView();
+    } else if (input.includes("mois")) {
+      switchToMonthView();
     }
+  }
+
+  async function fetchEvents() {
+    try {
+      const eventsData = await db.events.toArray();
+      console.log("Events:", eventsData);
+      events = eventsData;
+    } catch (error) {
+      console.error("Erreur lors de la récupération des événements", error);
+    }
+  }
 </script>
 
 <!-- 
@@ -186,63 +160,55 @@
     {:else if currentPage === 'profile'}
         <UserProfile {loggedInUser}/>
     {/if}
-    {#key loggedInUser}
-        <SideBarEvents bind:isOpen={isSidebarOpen} {loggedInUser}></SideBarEvents>
-    {/key}
+  {/if}
+  <SideBarEvents bind:isOpen={isSidebarOpen} {loggedInUser} {fetchEvents}></SideBarEvents>
 </main>
 
 <style>
-    main {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-    }
-
-    h1 {
-        font-size: 2rem;
-    }
-
-    .monthSection {
-        display: flex;
-        align-items: center;
-    }
-
-    .todayButton {
-        border: 1px solid rgb(69, 69, 69);
-        color: rgb(69, 69, 69);
-        padding: 10px;
-        text-align: center;
-        cursor: pointer;
-    }
-
-    .todayButton:hover {
-        background-color: rgb(69, 69, 69);
-        transition: 0.3s;
-        color: white;
-    }
-
-    .buttons {
-        display: flex;
-        align-items: center;
-    }
-
-    button {
-        background: none;
-        border: none;
-        cursor: pointer;
-        padding: 10px;
-    }
-
-    img {
-        width: 30px;
-        height: 30px;
-    }
+  main {
+    display: flex;
+    background-color: white;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+  h1 {
+    font-size: 2rem;
+  }
+  .monthSection {
+    display: flex;
+    align-items: center;
+  }
+  .todayButton {
+    border: 1px solid rgb(69, 69, 69);
+    color: rgb(69, 69, 69);
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+  }
+  .todayButton:hover {
+    background-color: rgb(69, 69, 69);
+    transition: 0.3s;
+    color: white;
+  }
+  .buttons {
+    display: flex;
+    align-items: center;
+  }
+  button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+  }
+  img {
+    width: 30px;
+    height: 30px;
+  }
 </style>

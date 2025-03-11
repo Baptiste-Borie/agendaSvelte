@@ -41,12 +41,13 @@
       {#each events as event}
         <button
           class="event"
+          style="background-color: {event.color}"
           on:click={(e) => {
             e.stopPropagation();
             openModal(event);
           }}
         >
-          <strong>{event.time_start}</strong> - {event.event_name}
+          <strong>{event.hour_start}</strong> - {event.eventName}
         </button>
       {/each}
     </div>
@@ -58,12 +59,12 @@
     <div class="modal-content">
       <button class="close" on:click={closeModal}>×</button>
       <div>
-        <h2>{selectedEvent.event_name}</h2>
+        <h2>{selectedEvent.eventName}</h2>
         <div class="tempo">
-          <p>{formatDate(new Date(selectedEvent.date))}</p>
+          <p>{formatDate(new Date(selectedEvent.eventDate))}</p>
           <div class="time">
-            <p>{selectedEvent.time_start}</p>
-            <p>{selectedEvent.time_end}</p>
+            <p>{selectedEvent.hour_start}</p>
+            <p>{selectedEvent.hour_end}</p>
           </div>
         </div>
         <hr />
@@ -115,7 +116,6 @@
   }
 
   .event {
-    background-color: #0b57d0;
     color: white;
     font-size: 12px;
     padding: 2px 4px;
