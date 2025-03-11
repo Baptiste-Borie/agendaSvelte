@@ -1,34 +1,78 @@
 <script>
     import { Datepicker } from 'svelte-calendar';
     import { format } from 'date-fns';
+    import db from './db.js';
+    import { createEventDispatcher } from 'svelte';
+
   
     export let isOpen;
     let eventName = '';
     let eventDate = null;
-    let shortDescription = '';
+    let hour_start = "";
+    let hour_end = "";
+    let description = "";
+    let color = "";
+    let userID = sessionStorage.getItem('userID');
+
+    const dispatch = createEventDispatcher(); // Création du dispatcher
+
     function closeSideBar() {
       isOpen = false;
+      dispatch('close'); 
     }
-  
-    function createEvent() {
-      if (eventName && eventDate) {
+
+    function clearAllFields() {
+      eventName = "";
+      eventDate = "";
+      hour_start = "";
+      hour_end = "";
+      description = "";
+      color = "#000000";
+    }
+    async function createEvent() {
+      try{
+        if (eventName && eventDate) {
+        const formattedDate = format(eventDate, 'yyyy-MM-dd');
+        const finalHourStart = hour_start || "00:00";  // Valeur par défaut
+        const finalHourEnd = hour_end || "00:00"; 
+        const finalDescription = description || null;  // Accepte null
+        const finalColor = color || "#000000"; 
+
         console.log("Événement créé :", {
           name: eventName,
-          date: format(eventDate, 'yyyy-MM-dd'),
+          description : finalDescription,
+          eventDate: formattedDate,
+          hour_start: finalHourStart,
+          hour_end: finalHourEnd, 
+          color : finalColor,
+          userID
         });
-        closeSideBar();
+        await db.events.add({
+          eventName,
+          description: finalDescription,
+          eventDate: formattedDate,
+          hour_start: finalHourStart,
+          hour_end: finalHourEnd,
+          color : finalColor,
+          userID
+        });
+        clearAllFields();
       } else {
-        alert("Veuillez remplir tous les champs !");
+        alert("Veuillez choisir au moins une Date et un titre pour votre événement  !");
+      }
+      }catch (error) {
+          console.error("Erreur lors de l'ajout de l'événement :", error);
+          alert("Une erreur est survenue lors de l'ajout de l'événement.");
       }
     }
   </script>
   
   {#if isOpen}
   <div class="sidenav">
-    <button onclick={closeSideBar} class="close-btn">X</button>
-
+    <button on:click={closeSideBar} class="close-btn">X</button>
+  
     <h2>Créez votre prochain événement</h2>
-
+  
     <div class="form-group">
       <label for="event-name">Nom de l'événement</label>
       <textarea
@@ -36,22 +80,64 @@
         bind:value={eventName}
         placeholder="Nom de l'événement"
         class="input-field"
+        required
       ></textarea>
     </div>
+  
     <div class="form-group">
-        <label for="short-description">Description courte</label>
-        <textarea
-          id="short-description"
-          bind:value={shortDescription}
-          placeholder="Description courte"
-          class="input-field"
-        ></textarea>
-      </div>
+      <label for="short-description">Description courte</label>
+      <textarea
+        id="short-description"
+        bind:value={description}
+        placeholder="Description courte (facultatif)"
+        class="input-field"
+      ></textarea>
+    </div>
+  
     <div class="form-group">
       <label for="event-date">Date de l'événement</label>
+      <input
+        type="date"
+        id="event-date"
+        bind:value={eventDate}
+        class="input-field"
+        required
+      />
     </div>
-    <button onclick={createEvent} class="create-btn">Créer</button>
+  
+    <div class="form-group">
+      <label for="event-start">Heure de début</label>
+      <input
+        type="time"
+        id="event-start"
+        bind:value={hour_start}
+        class="input-field"
+        required
+      />
+    </div>
+  
+    <div class="form-group">
+      <label for="event-end">Heure de fin</label>
+      <input
+        type="time"
+        id="event-end"
+        bind:value={hour_end}
+        class="input-field"
+      />
+    </div>
+  
+    <div class="form-group">
+      <label for="event-color">Couleur de l'événement</label>
+      <input
+        type="color"
+        id="event-color"
+        bind:value={color}
+        class="input-field"
+      />
+    </div>  
+    <button on:click={createEvent} class="submit-btn">Créer l'événement</button>
   </div>
+  
   {/if}
   
   <style>
