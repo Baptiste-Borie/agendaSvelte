@@ -1,9 +1,16 @@
 <script>
   import Cellule from "./Cellule.svelte";
-  import { parse, startOfMonth, startOfWeek, addDays, format } from "date-fns";
+  import {
+    parse,
+    startOfMonth,
+    startOfWeek,
+    addDays,
+    isSameDay,
+  } from "date-fns";
   import { fr } from "date-fns/locale";
 
   export let currentMonth;
+  export let events = [];
 
   let parsedDate = parse(currentMonth, "MMMM-yyyy", new Date(), { locale: fr });
   let firstDayOfMonth = startOfMonth(parsedDate);
@@ -15,6 +22,12 @@
 
   const header = ["L", "M", "M", "J", "V", "S", "D"];
   let today = new Date();
+
+  function getEventsForDay(day) {
+    return events.filter((event) =>
+      isSameDay(day, parse(event.date, "yyyy-MM-dd", new Date()))
+    );
+  }
 </script>
 
 <div class="month-grid">
@@ -22,7 +35,7 @@
     <div class="header">{head}</div>
   {/each}
   {#each days as day}
-    <Cellule date={day} {today} view={"Month"} />
+    <Cellule date={day} {today} view={"Month"} events={getEventsForDay(day)} />
   {/each}
 </div>
 
