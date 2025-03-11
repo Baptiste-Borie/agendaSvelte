@@ -5,6 +5,7 @@
 
   export let fetchEvents;
   export let isOpen;
+
   let eventName = "";
   let eventDate = null;
   let hour_start = "";

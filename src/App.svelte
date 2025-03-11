@@ -6,6 +6,7 @@
   import Login from "./lib/Login.svelte";
   import Week from "./lib/Week.svelte";
   import SideBarEvents from "./lib/SideBarEvents.svelte";
+  import Profile from "./lib/Profile.svelte";
   import {
     format,
     addMonths,
@@ -16,17 +17,17 @@
   } from "date-fns";
   import { fr } from "date-fns/locale";
 
-    let currentDate = new Date();
-    let currentView = "month";
-    let currentPage = "login";
-    let isSidebarOpen = false;
+  let currentDate = new Date();
+  let currentView = "month";
+  let currentPage = "login";
+  let isSidebarOpen = false;
 
   let events = [];
 
-    $: currentMonth = format(currentDate, "MMMM-yyyy", {locale: fr});
-    $: currentMonthLabel = format(currentDate, "MMMM yyyy", {locale: fr});
+  $: currentMonth = format(currentDate, "MMMM-yyyy", { locale: fr });
+  $: currentMonthLabel = format(currentDate, "MMMM yyyy", { locale: fr });
 
-    let loggedInUser = null;
+  let loggedInUser = null;
 
   function navigate(page) {
     currentPage = page;
@@ -82,7 +83,6 @@
   async function fetchEvents() {
     try {
       const eventsData = await db.events.toArray();
-      console.log("Events:", eventsData);
       events = eventsData;
     } catch (error) {
       console.error("Erreur lors de la récupération des événements", error);
@@ -97,71 +97,71 @@
   </main> -->
 
 <nav>
-    {#if loggedInUser}
-        <button onclick={handleLogout}>Déconnexion</button>
-        {#if currentPage !== "profile"}
-            <button onclick={() => (isSidebarOpen = !isSidebarOpen)}
-            >Créer un Evenement
-            </button
-            >
-        {/if}
-        <button onclick={() => navigate('profile')}>Modifier mon profil</button>
-    {:else}
-        <button onclick={() => navigate("login")}>Connexion</button>
+  {#if loggedInUser}
+    <button onclick={handleLogout}>Déconnexion</button>
+    {#if currentPage !== "profile"}
+      <button onclick={() => (isSidebarOpen = !isSidebarOpen)}
+        >Créer un Evenement
+      </button>
     {/if}
-    <button onclick={() => navigate("agenda")}>Agenda</button>
+    <button onclick={() => navigate("profile")}>Modifier mon profil</button>
+  {:else}
+    <button onclick={() => navigate("login")}>Connexion</button>
+  {/if}
+  <button onclick={() => navigate("agenda")}>Agenda</button>
 </nav>
 
 <main>
-    {#if currentPage === "login"}
-        <Login onLogin={handleLogin} onLogout={handleLogout}/>
-    {:else if currentPage === "agenda"}
-        <header class="header">
-            <div class="monthSection">
-                <div class="buttons">
-                    <button
-                            class="todayButton"
-                            onclick={() => (currentDate = new Date())}
-                    >
-                        Aujourd'hui
-                    </button>
-                    <button
-                            onclick={currentView === "month" ? previousMonth : previousWeek}
-                    >
-                        <img src={chevronBack} alt="Back"/>
-                    </button>
-                    <button onclick={currentView === "month" ? nextMonth : nextWeek}>
-                        <img src={chevronNext} alt="Next"/>
-                    </button>
-                </div>
-                <h1>{currentMonthLabel}</h1>
-            </div>
-            <div>
-                <select
-                        name="viewSelector"
-                        id="viewSelector"
-                        oninput={handleInputChange}
-                >
-                    <option value="mois">Mois</option>
-                    <option value="semaine">Semaine</option>
-                </select>
-            </div>
-        </header>
+  {#if currentPage === "login"}
+    <Login onLogin={handleLogin} onLogout={handleLogout} />
+  {:else if currentPage === "agenda"}
+    <header class="header">
+      <div class="monthSection">
+        <div class="buttons">
+          <button
+            class="todayButton"
+            onclick={() => (currentDate = new Date())}
+          >
+            Aujourd'hui
+          </button>
+          <button
+            onclick={currentView === "month" ? previousMonth : previousWeek}
+          >
+            <img src={chevronBack} alt="Back" />
+          </button>
+          <button onclick={currentView === "month" ? nextMonth : nextWeek}>
+            <img src={chevronNext} alt="Next" />
+          </button>
+        </div>
+        <h1>{currentMonthLabel}</h1>
+      </div>
+      <div>
+        <select
+          name="viewSelector"
+          id="viewSelector"
+          oninput={handleInputChange}
+        >
+          <option value="mois">Mois</option>
+          <option value="semaine">Semaine</option>
+        </select>
+      </div>
+    </header>
 
-        {#if currentView === "month"}
-            {#key currentMonth}
-                <Month {currentMonth} {events}/>
-            {/key}
-        {:else if currentView === "week"}
-            {#key startOfCurrentWeek}
-                <Week {startOfCurrentWeek} {events}/>
-            {/key}
-        {/if}
-    {:else if currentPage === 'profile'}
-        <UserProfile {loggedInUser}/>
+    {#if currentView === "month"}
+      {#key currentMonth}
+        <Month {currentMonth} {events} />
+      {/key}
+    {:else if currentView === "week"}
+      {#key startOfCurrentWeek}
+        <Week {startOfCurrentWeek} {events} />
+      {/key}
     {/if}
+  {:else if currentPage === "profile"}
+    <Profile {loggedInUser} />
   {/if}
-  <SideBarEvents bind:isOpen={isSidebarOpen} {loggedInUser} {fetchEvents}></SideBarEvents>
+  {#key loggedInUser}
+    <SideBarEvents bind:isOpen={isSidebarOpen} {fetchEvents}></SideBarEvents>
+  {/key}
 </main>
 
 <style>
