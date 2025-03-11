@@ -10,16 +10,53 @@
     addMonths,
     subMonths,
     startOfWeek,
-    endOfWeek,
+    subWeeks,
+    addWeeks,
   } from "date-fns";
   import { fr } from "date-fns/locale";
-
-
 
   let currentDate = new Date();
   let currentView = "month";
   let currentPage = "login";
   let isSidebarOpen = false;
+
+  let events = [
+    {
+      event_name: "Event 1",
+      description: "Event 1 description",
+      date: "2025-03-11",
+      time_start: "01:30",
+      time_end: "10:30",
+    },
+    {
+      event_name: "Event 2",
+      description: "Event 2 description",
+      date: "2025-03-11",
+      time_start: "09:30",
+      time_end: "10:30",
+    },
+    {
+      event_name: "Event 2",
+      description: "Event 2 description",
+      date: "2025-03-11",
+      time_start: "09:30",
+      time_end: "10:30",
+    },
+    {
+      event_name: "Event 2",
+      description: "Event 2 description",
+      date: "2025-03-11",
+      time_start: "09:30",
+      time_end: "10:30",
+    },
+    {
+      event_name: "Event 3",
+      description: "Event 3 description",
+      date: "2025-04-11",
+      time_start: "09:30",
+      time_end: "10:30",
+    },
+  ];
 
   $: currentMonth = format(currentDate, "MMMM-yyyy", { locale: fr });
   $: currentMonthLabel = format(currentDate, "MMMM yyyy", { locale: fr });
@@ -56,8 +93,16 @@
   function nextMonth() {
     currentDate = addMonths(currentDate, 1);
   }
+
+  function previousWeek() {
+    currentDate = subWeeks(currentDate, 1);
+  }
+
+  function nextWeek() {
+    currentDate = addWeeks(currentDate, 1);
+  }
+
   $: startOfCurrentWeek = startOfWeek(currentDate, { weekStartsOn: 1 });
-  $: endOfCurrentWeek = endOfWeek(currentDate, { weekStartsOn: 1 });
 
   function handleInputChange(event) {
     const input = event.target.value.toLowerCase();
@@ -69,6 +114,12 @@
   }
 </script>
 
+<!-- 
+  <main>
+    <button on:click={toggleSidebar}>Open SideBar</button>
+    <SideBarEvents {isOpen}/>
+  </main> -->
+
 <nav>
   {#if loggedInUser}
     <button onclick={handleLogout}>Déconnexion</button>
@@ -77,11 +128,11 @@
   {/if}
   <button onclick={() => navigate("agenda")}>Agenda</button>
   {#if loggedInUser}
-  <button onclick={() => isSidebarOpen = !isSidebarOpen}>Créer un Evenement</button>
+    <button onclick={() => (isSidebarOpen = !isSidebarOpen)}
+      >Créer un Evenement</button
+    >
   {/if}
 </nav>
-
-
 
 <main>
   {#if currentPage === "login"}
@@ -96,10 +147,12 @@
           >
             Aujourd'hui
           </button>
-          <button onclick={previousMonth}>
+          <button
+            onclick={currentView === "month" ? previousMonth : previousWeek}
+          >
             <img src={chevronBack} alt="Back" />
           </button>
-          <button onclick={nextMonth}>
+          <button onclick={currentView === "month" ? nextMonth : nextWeek}>
             <img src={chevronNext} alt="Next" />
           </button>
         </div>
@@ -119,15 +172,15 @@
 
     {#if currentView === "month"}
       {#key currentMonth}
-        <Month {currentMonth} />
+        <Month {currentMonth} {events} />
       {/key}
     {:else if currentView === "week"}
       {#key startOfCurrentWeek}
-        <Week {currentMonth} />
+        <Week {startOfCurrentWeek} {events} />
       {/key}
     {/if}
   {/if}
-  <SideBarEvents  bind:isOpen={isSidebarOpen}></SideBarEvents>
+  <SideBarEvents bind:isOpen={isSidebarOpen}></SideBarEvents>
 </main>
 
 <style>
