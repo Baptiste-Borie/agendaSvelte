@@ -1,6 +1,6 @@
 <script>
     import db from './db.js';
-    import { onMount } from 'svelte';
+    import {onMount} from 'svelte';
     import bcrypt from 'bcryptjs'; // Pour hasher les mdp
 
     export let onLogin;
@@ -24,8 +24,18 @@
         return await bcrypt.compare(inputPassword, hashedPassword);
     }
 
+    // Regex pour valider un email
+    function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+
     // Fonction pour gérer la connexion
     async function login() {
+        if (!isValidEmail(email)) {
+            error = 'Veuillez entrer une adresse email valide';
+            return;
+        }
         try {
             const user = await db.users.where('email').equals(email).first();
             if (user && await comparePasswords(password, user.password)) {
@@ -44,6 +54,10 @@
 
     // Fonction pour gérer l'inscription, vérifie que l'user n'existe pas avant de le créer
     async function register() {
+        if (!isValidEmail(email)) {
+            error = 'Veuillez entrer une adresse email valide';
+            return;
+        }
         try {
             const existingUser = await db.users.where('email').equals(email).first();
             if (existingUser) {
@@ -51,7 +65,7 @@
                 return;
             }
             const hashedPassword = await hashPassword(password);
-            await db.users.add({ username, email, password: hashedPassword });
+            await db.users.add({username, email, password: hashedPassword});
             error = '';
             console.log('Utilisateur enregistré avec succès');
             isRegistering = false;
@@ -89,16 +103,17 @@
             {#if isRegistering}
                 <div>
                     <label for="username">Nom d'utilisateur:</label>
-                    <input type="text" id="username" bind:value={username} required />
+                    <input type="text" id="username" bind:value={username} required/>
                 </div>
             {/if}
             <div>
                 <label for="email">Email:</label>
-                <input type="text" id="email" bind:value={email} required />
+                <input type="text" id="email" bind:value={email} class:invalid={!isValidEmail(email) && email}
+                       required/>
             </div>
             <div>
                 <label for="password">Mot de passe:</label>
-                <input type="password" id="password" bind:value={password} required />
+                <input type="password" id="password" bind:value={password} required/>
             </div>
             {#if error}
                 <p style="color: red;">{error}</p>
@@ -162,4 +177,9 @@
     a:hover {
         text-decoration: underline;
     }
+
+    .invalid {
+        border-color: red;
+    }
+
 </style>
