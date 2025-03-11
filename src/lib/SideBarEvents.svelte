@@ -8,8 +8,11 @@
   export let fetchEvents;
   export let isOpen;
   export let onClose;
-  export let selectedDate;
-  export let isEditing; 
+  export let isEditing;
+  export let selectedDate; 
+
+  $: selectedFormattedDate = selectedDate ? format(selectedDate, "yyyy-MM-dd") : "";
+
   onMount(() => {
         if (loggedInUser) {
             userID= loggedInUser.id;
@@ -112,7 +115,7 @@
       <input
         type="date"
         id="event-date"
-        bind:value={eventDate}
+        bind:value={selectedFormattedDate}
         class="input-field"
         required
       />
@@ -212,21 +215,5 @@
 
   .input-field::placeholder {
     color: #acb2b6;
-  }
-
-  .create-btn {
-    width: 100%;
-    padding: 10px;
-    background-color: #3498db;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s;
-  }
-
-  .create-btn:hover {
-    background-color: #2980b9;
   }
 </style>

@@ -93,6 +93,17 @@
   function handleCellClick(event) {
     selectedDate = event.date;
     isSidebarOpen = true;
+    console.log("date" + selectedDate)
+  }
+
+  function handleButtonCreateEvent(){
+    if(selectedDate != null){
+      console.log("premier if")
+      selectedDate = null;
+    }
+    if (isSidebarOpen == false) {
+      isSidebarOpen = true
+    }
   }
 
   async function fetchEvents() {
@@ -109,8 +120,8 @@
   {#if loggedInUser}
     <button onclick={() => handleButtonSidebarClose(handleLogout)}>Déconnexion</button>
     {#if currentPage !== "profile"}
-      <button onclick={() => (isSidebarOpen = !isSidebarOpen)}
-        >Créer un Evenement
+      <button onclick={() => handleButtonCreateEvent() }
+        >Créer un événement
       </button>
     {/if}
     <button onclick={() => handleButtonSidebarClose(() => navigate("profile"))}>Modifier mon profil</button>
