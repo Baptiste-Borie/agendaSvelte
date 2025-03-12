@@ -1,81 +1,85 @@
 <script>
-  import { format } from "date-fns";
   import db from "./db.js";
   import { onMount } from "svelte";
-  
 
-  export let loggedInUser; 
+  export let loggedInUser;
   export let fetchEvents;
   export let isOpen;
   export let onClose;
-  export let selectedDate;
-  export let isEditing; 
-  onMount(() => {
-        if (loggedInUser) {
-            userID= loggedInUser.id;
-        }
-    });
+  export let isEditing;
+  export let selectedDate; // selectedDate est déjà au format YYYY-MM-DD
+  export let selectedTitle;
+  export let selectedDescription;
+  export let selectedHourStart;
+  export let selectedHourEnd;
+  export let selectedColor;
+  export let selectedEventId;
 
-  let eventName = "";
-  let eventDate = null;
-  let hour_start = "";
-  let hour_end = "";
-  let description = "";
-  let color = "";
-  let userID ="";
+  let userID = "";
+
+  onMount(() => {
+    if (loggedInUser) {
+      userID = loggedInUser.id;
+    }
+  });
 
   function closeSideBar() {
     isOpen = false;
-    isEditing = false;
     onClose();
+    clearAllFields();
   }
 
   function clearAllFields() {
-    eventName = "";
-    eventDate = "";
-    hour_start = "";
-    hour_end = "";
-    description = "";
-    color = "#000000";
+    selectedTitle = "";
+    selectedDescription = "";
+    selectedHourStart = null;
+    selectedHourEnd = null;
+    selectedColor = null;
+    selectedEventId = null;
+    selectedDate = null;
   }
-  async function createEvent() {
-    try {
-      if (eventName && eventDate) {
-        const formattedDate = format(eventDate, "yyyy-MM-dd");
-        const finalHourStart = hour_start || "00:00"; // Valeur par défaut
-        const finalHourEnd = hour_end || "00:00";
-        const finalDescription = description || null; // Accepte null
-        const finalColor = color || "#000000";
 
-        console.log("Événement créé :", {
-          name: eventName,
-          description: finalDescription,
-          eventDate: formattedDate,
-          hour_start: finalHourStart,
-          hour_end: finalHourEnd,
-          color: finalColor,
-          userID,
-        });
-        await db.events.add({
-          eventName,
-          description: finalDescription,
-          eventDate: formattedDate,
-          hour_start: finalHourStart,
-          hour_end: finalHourEnd,
-          color: finalColor,
-          userID,
-        });
-        fetchEvents();
-        clearAllFields();
-        isEditing = false;
-      } else {
-        alert(
-          "Veuillez choisir au moins une Date et un titre pour votre événement  !"
-        );
+  async function handleSubmit() {
+    try {
+      console.log("selectedTitle:", selectedTitle);
+      console.log("selectedDate:", selectedDate);
+
+      if (!selectedTitle || !selectedDate) {
+        alert("Veuillez choisir au moins une date et un titre pour votre événement !");
+        return;
       }
+
+
+
+      if (isEditing && selectedEventId) {
+        // Mettre à jour l'événement existant
+        await db.events.update(selectedEventId, {
+          eventName: selectedTitle,
+          description: selectedDescription,
+          eventDate: selectedDate, 
+          hour_start: selectedHourStart,
+          hour_end: selectedHourEnd,
+          color: selectedColor,
+          userID,
+        });
+      } else {
+        // Créer un nouvel événement
+        await db.events.add({
+          eventName: selectedTitle,
+          description: selectedDescription,
+          eventDate: selectedDate, 
+          hour_start: selectedHourStart,
+          hour_end: selectedHourEnd,
+          color: selectedColor,
+          userID,
+        });
+      }
+
+      fetchEvents();
+      closeSideBar();
     } catch (error) {
-      console.error("Erreur lors de l'ajout de l'événement :", error);
-      alert("Une erreur est survenue lors de l'ajout de l'événement.");
+      console.error("Erreur lors de la création/modification de l'événement :", error);
+      alert("Une erreur est survenue lors de la création/modification de l'événement.");
     }
   }
 </script>
@@ -84,13 +88,13 @@
   <div class="sidenav">
     <button onclick={closeSideBar} class="close-btn">X</button>
 
-    <h2>Créez votre prochain événement</h2>
+    <h2>{isEditing ? "Modifier l'événement" : "Créer un événement"}</h2>
 
     <div class="form-group">
       <label for="event-name">Nom de l'événement</label>
       <textarea
         id="event-name"
-        bind:value={eventName}
+        bind:value={selectedTitle}
         placeholder="Nom de l'événement"
         class="input-field"
         required
@@ -101,7 +105,7 @@
       <label for="short-description">Description courte</label>
       <textarea
         id="short-description"
-        bind:value={description}
+        bind:value={selectedDescription}
         placeholder="Description courte (facultatif)"
         class="input-field"
       ></textarea>
@@ -112,7 +116,7 @@
       <input
         type="date"
         id="event-date"
-        bind:value={eventDate}
+        bind:value={selectedDate} 
         class="input-field"
         required
       />
@@ -123,7 +127,7 @@
       <input
         type="time"
         id="event-start"
-        bind:value={hour_start}
+        bind:value={selectedHourStart}
         class="input-field"
         required
       />
@@ -134,7 +138,7 @@
       <input
         type="time"
         id="event-end"
-        bind:value={hour_end}
+        bind:value={selectedHourEnd}
         class="input-field"
       />
     </div>
@@ -144,12 +148,13 @@
       <input
         type="color"
         id="event-color"
-        bind:value={color}
+        bind:value={selectedColor}
         class="input-field"
       />
     </div>
-    <button onclick={createEvent} class="submit-btn">
-      Créer l'événement
+
+    <button onclick={handleSubmit} class="submit-btn">
+      {isEditing ? "Modifier l'événement" : "Créer l'événement"}
     </button>
   </div>
 {/if}
@@ -166,6 +171,7 @@
     padding: 20px;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
   }
+
   .close-btn {
     background: none;
     border: none;
@@ -212,21 +218,5 @@
 
   .input-field::placeholder {
     color: #acb2b6;
-  }
-
-  .create-btn {
-    width: 100%;
-    padding: 10px;
-    background-color: #3498db;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s;
-  }
-
-  .create-btn:hover {
-    background-color: #2980b9;
   }
 </style>

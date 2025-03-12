@@ -5,7 +5,8 @@
   export let startOfCurrentWeek;
   export let events = [];
   export let onCellClick;
-
+  export let onModalClick;
+  export let isEditing; 
   let days = Array.from({ length: 7 }, (_, i) =>
     addDays(startOfCurrentWeek, i)
   );
@@ -25,7 +26,7 @@
     <div class="header">{head}</div>
   {/each}
   {#each days as day}
-    <Cellule date={day} {today} view={"Week"} events={getEventsForDay(day)} onCellClick={onCellClick} />
+    <Cellule date={day} {today} view={"Week"} events={getEventsForDay(day)} onCellClick={onCellClick} onModalClick = {onModalClick} {isEditing}/>
   {/each}
 </div>
 

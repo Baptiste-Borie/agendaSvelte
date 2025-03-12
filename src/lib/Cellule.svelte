@@ -1,9 +1,14 @@
 <script>
+  import { format } from "date-fns"; // Importe la fonction format
+
   export let date;
   export let today;
   export let view;
   export let events = [];
   export let onCellClick; 
+  export let onModalClick;
+  export let isEditing; // Ajoutez isEditing comme prop
+
   let isModalOpen = false;
   let selectedEvent = null;
 
@@ -31,7 +36,8 @@
   };
 
   function handleClick() {
-    onCellClick({date})
+    const formattedDate = format(date, "yyyy-MM-dd"); // Formate la date en YYYY-MM-DD
+    onCellClick({ date:formattedDate });
   }
 
   function handleKeydown(event) {
@@ -42,10 +48,9 @@
   }
 </script>
 
-
-<div class={"cellule " + (isWeekView ? "week" : "month")} onclick={handleClick} onkeydown={handleKeydown}  tabindex="0" role="button"> 
+<div class={"cellule " + (isWeekView ? "week" : "month")} onclick={handleClick} onkeydown={handleKeydown} tabindex="0" role="button">
   {#if date}
-    <span class={isToday(date) ? "today" : ""} >{date.getDate()}</span>
+    <span class={isToday(date) ? "today" : ""}>{date.getDate()}</span>
   {/if}
 
   {#if events.length > 0}
@@ -57,6 +62,7 @@
           onclick={(e) => {
             e.stopPropagation();
             openModal(event);
+            onModalClick(event);
           }}
         >
           <strong>{event.hour_start}</strong> - {event.eventName}
@@ -81,10 +87,13 @@
         </div>
         <hr />
         <p>{selectedEvent.description}</p>
-        <button onclick={(e) => {
-          handleClick();
-          closeModal();
-        }}> Modifier</button>
+        <button
+          onclick={(e) => {
+            handleClick();
+            closeModal();
+            isEditing = true; // Mettez isEditing à true
+            onModalClick(selectedEvent); // Passez l'événement sélectionné
+          }}>Modifier</button>
       </div>
     </div>
   </div>
