@@ -49,31 +49,28 @@
         return;
       }
 
-      const finalHourStart = selectedHourStart || "00:00";
-      const finalHourEnd = selectedHourEnd || "00:00";
-      const finalDescription = selectedDescription || null;
-      const finalColor = selectedColor || "#000000";
+
 
       if (isEditing && selectedEventId) {
         // Mettre à jour l'événement existant
         await db.events.update(selectedEventId, {
           eventName: selectedTitle,
-          description: finalDescription,
+          description: selectedDescription,
           eventDate: selectedDate, 
-          hour_start: finalHourStart,
-          hour_end: finalHourEnd,
-          color: finalColor,
+          hour_start: selectedHourStart,
+          hour_end: selectedHourEnd,
+          color: selectedColor,
           userID,
         });
       } else {
         // Créer un nouvel événement
         await db.events.add({
           eventName: selectedTitle,
-          description: finalDescription,
+          description: selectedDescription,
           eventDate: selectedDate, 
-          hour_start: finalHourStart,
-          hour_end: finalHourEnd,
-          color: finalColor,
+          hour_start: selectedHourStart,
+          hour_end: selectedHourEnd,
+          color: selectedColor,
           userID,
         });
       }
