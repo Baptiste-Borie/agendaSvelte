@@ -21,9 +21,18 @@
   let currentView = "month";
   let currentPage = "login";
   let isSidebarOpen = false;
-  let selectedDate = null;
-  let isEditing = false;
   let events = [];
+  let isEditing = false;
+  let selectedDate = null;
+  let selectedTitle = "";
+  let selectedDescription = "";
+  let selectedHourStart = null; 
+  let selectedHourEnd = null;
+  let selectedColor = null; 
+  let selectedEventId = null;
+
+
+  
 
   $: currentMonth = format(currentDate, "MMMM-yyyy", { locale: fr });
   $: currentMonthLabel = format(currentDate, "MMMM yyyy", { locale: fr });
@@ -83,6 +92,8 @@
 
   function handleSidebarClose() {
     isSidebarOpen = false;
+    isEditing = false;
+    clearAllFields();
   }
   
   function handleButtonSidebarClose(action){
@@ -90,21 +101,46 @@
     action();
   }
 
+  function clearAllFields() {
+  selectedTitle = "";
+  selectedDescription = "";
+  selectedHourStart = null;
+  selectedHourEnd = null;
+  selectedColor = null;
+  selectedEventId = null;
+}
+
+  function openEditSidebar(event) {
+    isEditing = true;
+    isSidebarOpen = true;
+
+    selectedDate = event.date;
+    selectedTitle = event.eventName; 
+    selectedDescription = event.description;
+    selectedHourStart = event.hour_start;
+    selectedHourEnd = event.hour_end;
+    selectedColor = event.color;
+    selectedEventId = event.id;
+  }
+
   function handleCellClick(event) {
+    isEditing = false;
     selectedDate = event.date;
     isSidebarOpen = true;
-    console.log("date" + selectedDate)
   }
 
   function handleButtonCreateEvent(){
     if(selectedDate != null){
-      console.log("premier if")
       selectedDate = null;
     }
     if (isSidebarOpen == false) {
-      isSidebarOpen = true
+      isSidebarOpen = true;
+      isEditing = false;
+      clearAllFields();
     }
   }
+
+
 
   async function fetchEvents() {
     try {
@@ -169,18 +205,31 @@
 
     {#if currentView === "month"}
       {#key currentMonth}
-        <Month {currentMonth} {events} onCellClick={handleCellClick}/>
+        <Month {currentMonth} {events} onCellClick={handleCellClick} onModalClick={openEditSidebar} {isEditing}/>
       {/key}
     {:else if currentView === "week"}
       {#key startOfCurrentWeek}
-        <Week {startOfCurrentWeek} {events} onCellClick={handleCellClick}/>
+        <Week {startOfCurrentWeek} {events} onCellClick={handleCellClick} onModalClick={openEditSidebar} {isEditing}/>
       {/key}
     {/if}
   {:else if currentPage === "profile"}
     <Profile {loggedInUser} />
   {/if}
   {#key loggedInUser}
-    <SideBarEvents bind:isOpen={isSidebarOpen} {fetchEvents} {loggedInUser} onClose={handleSidebarClose} {selectedDate} {isEditing}></SideBarEvents>
+  <SideBarEvents
+    bind:isOpen={isSidebarOpen}
+    {fetchEvents}
+    {loggedInUser}
+    onClose={handleSidebarClose}
+    {selectedDate}
+    {isEditing}
+    {selectedTitle}
+    {selectedDescription}
+    {selectedHourStart}
+    {selectedHourEnd}
+    {selectedColor}
+    {selectedEventId}
+  />
   {/key}
 </main>
 
