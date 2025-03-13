@@ -1,16 +1,19 @@
 <script>
-  import { format } from "date-fns"; // Importe la fonction format
+  import { format } from "date-fns";
+  import db from './db.js';
 
   export let date;
   export let today;
   export let view;
   export let events = [];
-  export let onCellClick; 
+  export let onCellClick;
   export let onModalClick;
-  // export let isEditing; 
-  export let clearAllFieldsProp; 
+  // export let isEditing;
+  export let clearAllFieldsProp;
   let isModalOpen = false;
+  let isConfirmModalOpen = false;
   let selectedEvent = null;
+  let eventIdToDelete = null;
 
   const isToday = (date) => {
     const todayDate = today.setHours(0, 0, 0, 0);
@@ -21,14 +24,14 @@
   const isWeekView = view === "Week";
 
   // code deepseek: il ajoute la propriété date à event au moment où on ouvre la modal,
-  // parce que sinon lorsqu'on modifie un event on récupére pas la date 
-  // obliger de passer par cette fonction pour modifier un event pour l'instant 
-  // parce que on peut pas modifier un event autrement. Donc j'ajoute la propriété date ici, mais du coup c'est pas optimal. Mais ça fonctionne. 
-  
+  // parce que sinon lorsqu'on modifie un event on récupére pas la date
+  // obliger de passer par cette fonction pour modifier un event pour l'instant
+  // parce que on peut pas modifier un event autrement. Donc j'ajoute la propriété date ici, mais du coup c'est pas optimal. Mais ça fonctionne.
+
   const openModal = (event) => {
     selectedEvent = {
-    ...event, 
-    date: format(event.eventDate, "yyyy-MM-dd"), 
+    ...event,
+    date: format(event.eventDate, "yyyy-MM-dd"),
   };
 
   console.log(date)
@@ -56,6 +59,24 @@
       handleClick();
     }
   }
+
+  // Ouvre le modale de confirmation
+  function confirmDelete(eventId) {
+    eventIdToDelete = eventId;
+    isConfirmModalOpen = true;
+  }
+
+  // Supprime l'event de la base de données
+  async function deleteEvent() {
+    try {
+      await db.events.delete(eventIdToDelete);
+      events = events.filter(event => event.id !== eventIdToDelete);
+      closeModal();
+      isConfirmModalOpen = false;
+    } catch (err) {
+      console.error("Erreur lors de la suppression de l'événement :", err);
+    }
+  }
 </script>
 
 <div class={"cellule " + (isWeekView ? "week" : "month")} onclick={() => { handleClick(); clearAllFieldsProp(); }} onkeydown={handleKeydown} tabindex="0" role="button">
@@ -67,9 +88,9 @@
     <div class="event-container">
       {#each events as event}
         <button
-          class="event"
-          style="background-color: {event.color}"
-          onclick={(e) => {
+                class="event"
+                style="background-color: {event.color}"
+                onclick={(e) => {
             e.stopPropagation();
             openModal(event);
             // onModalClick(event);
@@ -99,9 +120,29 @@
         <p>{selectedEvent.description}</p>
         <button
           onclick={() => {
-            onModalClick(selectedEvent); 
+            onModalClick(selectedEvent);
             closeModal();
           }}>Modifier</button>
+        <button class="btn-red" onclick={() => confirmDelete(selectedEvent.id)}>
+          Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+{/if}
+
+{#if isConfirmModalOpen}
+  <div class="modal">
+    <div class="modal-content">
+      <h2>Confirmer la suppression</h2>
+      <p>Êtes-vous sûr de vouloir supprimer cet événement ?</p>
+      <div>
+        <button class="btn-red" onclick={deleteEvent}>
+          Oui, supprimer
+        </button>
+        <button onclick={() => isConfirmModalOpen = false}>
+          Annuler
+        </button>
       </div>
     </div>
   </div>
@@ -217,5 +258,10 @@
     cursor: pointer;
     color: #333;
     font-weight: bold;
+  }
+
+  .btn-red {
+    background-color: red;
+    color: white;
   }
 </style>
