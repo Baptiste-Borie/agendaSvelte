@@ -44,6 +44,8 @@
       console.log("selectedTitle:", selectedTitle);
       console.log("selectedDate:", selectedDate);
 
+      
+
       if (!selectedTitle || !selectedDate) {
         alert("Veuillez choisir au moins une date et un titre pour votre événement !");
         return;
@@ -74,7 +76,6 @@
           userID,
         });
       }
-
       fetchEvents();
       closeSideBar();
     } catch (error) {
