@@ -7,8 +7,8 @@
   export let events = [];
   export let onCellClick; 
   export let onModalClick;
-  export let isEditing; // Ajoutez isEditing comme prop
-
+  // export let isEditing; 
+  export let clearAllFieldsProp; 
   let isModalOpen = false;
   let selectedEvent = null;
 
@@ -27,7 +27,7 @@
 
   const closeModal = () => {
     isModalOpen = false;
-    selectedEvent = null;
+    // selectedEvent = null;
   };
 
   const formatDate = (date) => {
@@ -48,7 +48,7 @@
   }
 </script>
 
-<div class={"cellule " + (isWeekView ? "week" : "month")} onclick={handleClick} onkeydown={handleKeydown} tabindex="0" role="button">
+<div class={"cellule " + (isWeekView ? "week" : "month")} onclick={() => { handleClick(); clearAllFieldsProp(); }} onkeydown={handleKeydown} tabindex="0" role="button">
   {#if date}
     <span class={isToday(date) ? "today" : ""}>{date.getDate()}</span>
   {/if}
@@ -62,7 +62,7 @@
           onclick={(e) => {
             e.stopPropagation();
             openModal(event);
-            onModalClick(event);
+            // onModalClick(event);
           }}
         >
           <strong>{event.hour_start}</strong> - {event.eventName}
@@ -88,11 +88,9 @@
         <hr />
         <p>{selectedEvent.description}</p>
         <button
-          onclick={(e) => {
-            handleClick();
+          onclick={() => {
+            onModalClick(selectedEvent); 
             closeModal();
-            isEditing = true; // Mettez isEditing à true
-            onModalClick(selectedEvent); // Passez l'événement sélectionné
           }}>Modifier</button>
       </div>
     </div>
