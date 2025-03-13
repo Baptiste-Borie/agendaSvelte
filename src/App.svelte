@@ -205,11 +205,11 @@
 
     {#if currentView === "month"}
       {#key currentMonth}
-        <Month {currentMonth} {events} onCellClick={handleCellClick} onModalClick={openEditSidebar} {isEditing} clearAllFieldsProp={clearAllFields}/>
+        <Month {currentMonth} {events} onCellClick={handleCellClick} onModalClick={openEditSidebar} {isEditing} clearAllFieldsProp={clearAllFields} {loggedInUser}/>
       {/key}
     {:else if currentView === "week"}
       {#key startOfCurrentWeek}
-        <Week {startOfCurrentWeek} {events} onCellClick={handleCellClick} onModalClick={openEditSidebar} {isEditing} clearAllFieldsProp={clearAllFields}/>
+        <Week {startOfCurrentWeek} {events} onCellClick={handleCellClick} onModalClick={openEditSidebar} {isEditing} clearAllFieldsProp={clearAllFields} {loggedInUser}/>
       {/key}
     {/if}
   {:else if currentPage === "profile"}

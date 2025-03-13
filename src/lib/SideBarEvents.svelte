@@ -15,11 +15,11 @@
   export let selectedColor;
   export let selectedEventId;
 
-  let userID = "";
+  let userId = "";
 
   onMount(() => {
     if (loggedInUser) {
-      userID = loggedInUser.id;
+      userId = loggedInUser.id;
     }
   });
 
@@ -62,7 +62,7 @@
           hour_start: selectedHourStart,
           hour_end: selectedHourEnd,
           color: selectedColor,
-          userID,
+          userId,
         });
       } else {
         // Créer un nouvel événement
@@ -73,7 +73,7 @@
           hour_start: selectedHourStart,
           hour_end: selectedHourEnd,
           color: selectedColor,
-          userID,
+          userId,
         });
       }
       fetchEvents();
