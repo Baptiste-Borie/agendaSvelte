@@ -8,8 +8,8 @@
   export let events = [];
   export let onCellClick;
   export let onModalClick;
-  export let isEditing;
-
+  // export let isEditing;
+  export let clearAllFieldsProp;
   let isModalOpen = false;
   let isConfirmModalOpen = false;
   let selectedEvent = null;
@@ -23,14 +23,24 @@
 
   const isWeekView = view === "Week";
 
+  // code deepseek: il ajoute la propriété date à event au moment où on ouvre la modal,
+  // parce que sinon lorsqu'on modifie un event on récupére pas la date
+  // obliger de passer par cette fonction pour modifier un event pour l'instant
+  // parce que on peut pas modifier un event autrement. Donc j'ajoute la propriété date ici, mais du coup c'est pas optimal. Mais ça fonctionne.
+
   const openModal = (event) => {
-    selectedEvent = event;
+    selectedEvent = {
+    ...event,
+    date: format(event.eventDate, "yyyy-MM-dd"),
+  };
+
+  console.log(date)
     isModalOpen = true;
   };
 
   const closeModal = () => {
     isModalOpen = false;
-    selectedEvent = null;
+    // selectedEvent = null;
   };
 
   const formatDate = (date) => {
@@ -39,21 +49,24 @@
   };
 
   function handleClick() {
-    const formattedDate = format(date, "yyyy-MM-dd");
-    onCellClick({ date: formattedDate });
+    const formattedDate = format(date, "yyyy-MM-dd"); // Formate la date en YYYY-MM-DD
+    onCellClick({ date:formattedDate });
   }
 
   function handleKeydown(event) {
+    // Permet d'activer l'élément avec la touche "Entrée" ou "Espace"
     if (event.key === "Enter" || event.key === " ") {
       handleClick();
     }
   }
 
+  // Ouvre le modale de confirmation
   function confirmDelete(eventId) {
     eventIdToDelete = eventId;
     isConfirmModalOpen = true;
   }
 
+  // Supprime l'event de la base de données
   async function deleteEvent() {
     try {
       await db.events.delete(eventIdToDelete);
@@ -66,7 +79,7 @@
   }
 </script>
 
-<div class={"cellule " + (isWeekView ? "week" : "month")} onclick={handleClick} onkeydown={handleKeydown} tabindex="0" role="button">
+<div class={"cellule " + (isWeekView ? "week" : "month")} onclick={() => { handleClick(); clearAllFieldsProp(); }} onkeydown={handleKeydown} tabindex="0" role="button">
   {#if date}
     <span class={isToday(date) ? "today" : ""}>{date.getDate()}</span>
   {/if}
@@ -80,7 +93,7 @@
                 onclick={(e) => {
             e.stopPropagation();
             openModal(event);
-            onModalClick(event);
+            // onModalClick(event);
           }}
         >
           <strong>{event.hour_start}</strong> - {event.eventName}
@@ -106,11 +119,9 @@
         <hr />
         <p>{selectedEvent.description}</p>
         <button
-                onclick={(e) => {
-            handleClick();
-            closeModal();
-            isEditing = true;
+          onclick={() => {
             onModalClick(selectedEvent);
+            closeModal();
           }}>Modifier</button>
         <button class="btn-red" onclick={() => confirmDelete(selectedEvent.id)}>
           Supprimer

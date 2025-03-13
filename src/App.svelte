@@ -102,18 +102,18 @@
   }
 
   function clearAllFields() {
-  selectedTitle = "";
-  selectedDescription = "";
-  selectedHourStart = null;
-  selectedHourEnd = null;
-  selectedColor = null;
-  selectedEventId = null;
-}
+    selectedTitle = "";
+    selectedDescription = "";
+    selectedHourStart = null;
+    selectedHourEnd = null;
+    selectedColor = null;
+    selectedEventId = null;
+  }
 
   function openEditSidebar(event) {
     isEditing = true;
     isSidebarOpen = true;
-
+    
     selectedDate = event.date;
     selectedTitle = event.eventName; 
     selectedDescription = event.description;
@@ -205,11 +205,11 @@
 
     {#if currentView === "month"}
       {#key currentMonth}
-        <Month {currentMonth} {events} onCellClick={handleCellClick} onModalClick={openEditSidebar} {isEditing}/>
+        <Month {currentMonth} {events} onCellClick={handleCellClick} onModalClick={openEditSidebar} {isEditing} clearAllFieldsProp={clearAllFields}/>
       {/key}
     {:else if currentView === "week"}
       {#key startOfCurrentWeek}
-        <Week {startOfCurrentWeek} {events} onCellClick={handleCellClick} onModalClick={openEditSidebar} {isEditing}/>
+        <Week {startOfCurrentWeek} {events} onCellClick={handleCellClick} onModalClick={openEditSidebar} {isEditing} clearAllFieldsProp={clearAllFields}/>
       {/key}
     {/if}
   {:else if currentPage === "profile"}
