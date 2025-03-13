@@ -1,16 +1,19 @@
 <script>
-  import { format } from "date-fns"; // Importe la fonction format
+  import { format } from "date-fns";
+  import db from './db.js';
 
   export let date;
   export let today;
   export let view;
   export let events = [];
-  export let onCellClick; 
+  export let onCellClick;
   export let onModalClick;
-  export let isEditing; // Ajoutez isEditing comme prop
+  export let isEditing;
 
   let isModalOpen = false;
+  let isConfirmModalOpen = false;
   let selectedEvent = null;
+  let eventIdToDelete = null;
 
   const isToday = (date) => {
     const todayDate = today.setHours(0, 0, 0, 0);
@@ -36,14 +39,29 @@
   };
 
   function handleClick() {
-    const formattedDate = format(date, "yyyy-MM-dd"); // Formate la date en YYYY-MM-DD
-    onCellClick({ date:formattedDate });
+    const formattedDate = format(date, "yyyy-MM-dd");
+    onCellClick({ date: formattedDate });
   }
 
   function handleKeydown(event) {
-    // Permet d'activer l'élément avec la touche "Entrée" ou "Espace"
     if (event.key === "Enter" || event.key === " ") {
       handleClick();
+    }
+  }
+
+  function confirmDelete(eventId) {
+    eventIdToDelete = eventId;
+    isConfirmModalOpen = true;
+  }
+
+  async function deleteEvent() {
+    try {
+      await db.events.delete(eventIdToDelete);
+      events = events.filter(event => event.id !== eventIdToDelete);
+      closeModal();
+      isConfirmModalOpen = false;
+    } catch (err) {
+      console.error("Erreur lors de la suppression de l'événement :", err);
     }
   }
 </script>
@@ -57,9 +75,9 @@
     <div class="event-container">
       {#each events as event}
         <button
-          class="event"
-          style="background-color: {event.color}"
-          onclick={(e) => {
+                class="event"
+                style="background-color: {event.color}"
+                onclick={(e) => {
             e.stopPropagation();
             openModal(event);
             onModalClick(event);
@@ -88,12 +106,32 @@
         <hr />
         <p>{selectedEvent.description}</p>
         <button
-          onclick={(e) => {
+                onclick={(e) => {
             handleClick();
             closeModal();
-            isEditing = true; // Mettez isEditing à true
-            onModalClick(selectedEvent); // Passez l'événement sélectionné
+            isEditing = true;
+            onModalClick(selectedEvent);
           }}>Modifier</button>
+        <button class="btn-red" onclick={() => confirmDelete(selectedEvent.id)}>
+          Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+{/if}
+
+{#if isConfirmModalOpen}
+  <div class="modal">
+    <div class="modal-content">
+      <h2>Confirmer la suppression</h2>
+      <p>Êtes-vous sûr de vouloir supprimer cet événement ?</p>
+      <div>
+        <button class="btn-red" onclick={deleteEvent}>
+          Oui, supprimer
+        </button>
+        <button onclick={() => isConfirmModalOpen = false}>
+          Annuler
+        </button>
       </div>
     </div>
   </div>
@@ -209,5 +247,10 @@
     cursor: pointer;
     color: #333;
     font-weight: bold;
+  }
+
+  .btn-red {
+    background-color: red;
+    color: white;
   }
 </style>
