@@ -20,8 +20,18 @@
 
   const isWeekView = view === "Week";
 
+  // code deepseek: il ajoute la propriété date à event au moment où on ouvre la modal,
+  // parce que sinon lorsqu'on modifie un event on récupére pas la date 
+  // obliger de passer par cette fonction pour modifier un event pour l'instant 
+  // parce que on peut pas modifier un event autrement. Donc j'ajoute la propriété date ici, mais du coup c'est pas optimal. Mais ça fonctionne. 
+  
   const openModal = (event) => {
-    selectedEvent = event;
+    selectedEvent = {
+    ...event, 
+    date: format(event.eventDate, "yyyy-MM-dd"), 
+  };
+
+  console.log(date)
     isModalOpen = true;
   };
 

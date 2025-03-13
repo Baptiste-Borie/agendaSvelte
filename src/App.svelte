@@ -113,7 +113,7 @@
   function openEditSidebar(event) {
     isEditing = true;
     isSidebarOpen = true;
-
+    
     selectedDate = event.date;
     selectedTitle = event.eventName; 
     selectedDescription = event.description;
