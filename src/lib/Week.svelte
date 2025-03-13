@@ -2,6 +2,7 @@
   import Cellule from "./Cellule.svelte";
   import { addDays, isSameDay, parse } from "date-fns";
 
+  export let loggedInUser;
   export let startOfCurrentWeek;
   export let events = [];
   export let onCellClick;
@@ -28,7 +29,7 @@
     <div class="header">{head}</div>
   {/each}
   {#each days as day}
-    <Cellule date={day} {today} view={"Week"} events={getEventsForDay(day)} onCellClick={onCellClick} onModalClick = {onModalClick} {clearAllFieldsProp} />
+    <Cellule date={day} {today} view={"Week"} events={getEventsForDay(day)} onCellClick={onCellClick} onModalClick = {onModalClick} {clearAllFieldsProp} {loggedInUser} />
   {/each}
 </div>
 

@@ -9,6 +9,7 @@
   } from "date-fns";
   import { fr } from "date-fns/locale";
 
+  export let loggedInUser;
   export let currentMonth;
   export let events = [];
   export let onCellClick;
@@ -39,7 +40,7 @@
     <div class="header">{head}</div>
   {/each}
   {#each days as day}
-    <Cellule date={day} {today} view={"Month"} events={getEventsForDay(day)} onCellClick={onCellClick} onModalClick = {onModalClick}  {clearAllFieldsProp} />
+    <Cellule date={day} {today} view={"Month"} events={getEventsForDay(day)} onCellClick={onCellClick} onModalClick = {onModalClick}  {clearAllFieldsProp} {loggedInUser}/>
   {/each}
 </div>
 

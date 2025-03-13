@@ -2,6 +2,7 @@
   import { format } from "date-fns";
   import db from './db.js';
 
+  export let loggedInUser;
   export let date;
   export let today;
   export let view;
@@ -87,17 +88,19 @@
   {#if events.length > 0}
     <div class="event-container">
       {#each events as event}
-        <button
-                class="event"
-                style="background-color: {event.color}"
-                onclick={(e) => {
-            e.stopPropagation();
-            openModal(event);
-            // onModalClick(event);
-          }}
-        >
-          <strong>{event.hour_start}</strong> - {event.eventName}
-        </button>
+        {#if loggedInUser.id === event.userId}
+          <button
+                  class="event"
+                  style="background-color: {event.color}"
+                  onclick={(e) => {
+              e.stopPropagation();
+              openModal(event);
+              // onModalClick(event);
+            }}
+          >
+            <strong>{event.hour_start}</strong> - {event.eventName}
+          </button>
+          {/if}
       {/each}
     </div>
   {/if}
