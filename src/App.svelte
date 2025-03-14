@@ -6,6 +6,7 @@
   import Login from "./lib/Login.svelte";
   import Week from "./lib/Week.svelte";
   import SideBarEvents from "./lib/SideBarEvents.svelte";
+  import CurrentMonth from "./lib/CurrentMonth.svelte";
   import Profile from "./lib/Profile.svelte";
   import {
     format,
@@ -35,7 +36,6 @@
   
 
   $: currentMonth = format(currentDate, "MMMM-yyyy", { locale: fr });
-  $: currentMonthLabel = format(currentDate, "MMMM yyyy", { locale: fr });
 
   let loggedInUser = null;
 
@@ -140,7 +140,9 @@
     }
   }
 
-
+  function updateDateParent(date) {
+    currentMonth = date;
+  }
 
   async function fetchEvents() {
     try {
@@ -189,7 +191,7 @@
             <img src={chevronNext} alt="Next" />
           </button>
         </div>
-        <h1>{currentMonthLabel}</h1>
+        <CurrentMonth {currentMonth} {updateDateParent} />
       </div>
       <div>
         <select
