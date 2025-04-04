@@ -29,6 +29,13 @@
   // obliger de passer par cette fonction pour modifier un event pour l'instant
   // parce que on peut pas modifier un event autrement. Donc j'ajoute la propriété date ici, mais du coup c'est pas optimal. Mais ça fonctionne.
 
+
+  /**
+   * Ouvre un modal et prépare l'événement sélectionné pour l'affichage
+   * @param {Object} event - L'objet événement à afficher dans le modal
+   * @param {Date} event.eventDate - La date de l'événement à formater
+   * @returns {void} - Modifie la variable selectedEvent avec l'événement formaté
+   */
   const openModal = (event) => {
     selectedEvent = {
     ...event,
@@ -39,35 +46,61 @@
     isModalOpen = true;
   };
 
+  /**
+   * Ferme le modal et réinitialise l'événement sélectionné (optionnel)
+   * @returns {void} - Modifie l'état `isModalOpen` à `false`
+   * @example
+   * closeModal(); // Ferme le modal
+   */
   const closeModal = () => {
     isModalOpen = false;
     // selectedEvent = null;
   };
 
+  /**
+   * Formate une date en texte lisible en français (ex: "lundi 25 octobre")
+   * @param {Date} date - La date à formater
+   * @returns {string} - La date formatée selon les conventions françaises
+   */
   const formatDate = (date) => {
     const options = { weekday: "long", day: "numeric", month: "long" };
     return new Intl.DateTimeFormat("fr-FR", options).format(date);
   };
 
+  /**
+   * Gère le clic sur une cellule du calendrier en formatant la date et en déclenchant un callback
+   * @returns {void}
+   */
   function handleClick() {
-    const formattedDate = format(date, "yyyy-MM-dd"); // Formate la date en YYYY-MM-DD
+    const formattedDate = format(date, "yyyy-MM-dd");
     onCellClick({ date:formattedDate });
   }
 
-  function handleKeydown(event) {
-    // Permet d'activer l'élément avec la touche "Entrée" ou "Espace"
+  /**
+   * Gère les événements clavier pour activer un élément via Entrée ou Espace
+   * @param {KeyboardEvent} event - L'événement clavier déclenché
+   * @returns {void}
+   *
+   */
+   function handleKeydown(event) {
     if (event.key === "Enter" || event.key === " ") {
       handleClick();
     }
   }
 
-  // Ouvre le modale de confirmation
+  /**
+   * Prépare la suppression d'un événement en ouvrant un modal de confirmation
+   *
+   * @param {string|number} eventId - L'identifiant unique de l'événement à supprimer
+   */
   function confirmDelete(eventId) {
     eventIdToDelete = eventId;
     isConfirmModalOpen = true;
   }
 
-  // Supprime l'event de la base de données
+  /**
+   * Supprime un événement de la base de données
+   */
   async function deleteEvent() {
     try {
       await db.events.delete(eventIdToDelete);

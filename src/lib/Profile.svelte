@@ -10,7 +10,10 @@
   let password = "";
   let error = "";
 
-  // Charger les informations de l'utilisateur au montage du composant
+  /**
+   * Hook de cycle de vie qui s'exécute lorsque le composant est monté dans le DOM.
+   * Initialise les données utilisateur si celui-ci est connecté.
+   */
   onMount(() => {
     if (loggedInUser) {
       console.log(loggedInUser.id);
@@ -19,7 +22,9 @@
     }
   });
 
-  // Fonction pour mettre à jour les informations de l'utilisateur
+  /**
+   * Met à jour les informations de l'utilisateur dans la base de données et dans l'état local
+   */
   async function updateUser() {
     if (!username || !email) {
       error = "Veuillez remplir tous les champs obligatoires.";
@@ -45,7 +50,9 @@
     }
   }
 
-  // Fonction pour hasher les mots de passe
+  /**
+   * Chiffre un mot de passe de manière sécurisée en utilisant bcrypt
+   */
   async function hashPassword(password) {
     const salt = await bcrypt.genSalt(10);
     return await bcrypt.hash(password, salt);

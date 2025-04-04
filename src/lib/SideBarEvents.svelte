@@ -23,6 +23,9 @@
     }
   });
 
+  /**
+   * Ferme la sidebar, déclenche onClose et réinitialise les champs.
+   */
   function closeSideBar() {
     isOpen = false;
     onClose();
@@ -39,22 +42,20 @@
     selectedDate = null;
   }
 
+  /**
+   * Gère la soumission du formulaire d'événement (création ou édition)
+   */
   async function handleSubmit() {
     try {
       console.log("selectedTitle:", selectedTitle);
       console.log("selectedDate:", selectedDate);
-
-      
 
       if (!selectedTitle || !selectedDate) {
         alert("Veuillez choisir au moins une date et un titre pour votre événement !");
         return;
       }
 
-
-
       if (isEditing && selectedEventId) {
-        // Mettre à jour l'événement existant
         await db.events.update(selectedEventId, {
           eventName: selectedTitle,
           description: selectedDescription,
@@ -65,7 +66,6 @@
           userId,
         });
       } else {
-        // Créer un nouvel événement
         await db.events.add({
           eventName: selectedTitle,
           description: selectedDescription,
