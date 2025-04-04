@@ -17,6 +17,11 @@
   const header = ["L", "M", "M", "J", "V", "S", "D"];
   let today = new Date();
 
+  /**
+   * Filtre les événements pour n'afficher que ceux du jour spécifié
+   * @param {Date} day - La date à comparer
+   * @returns {Array} Liste des événements du jour
+   */
   function getEventsForDay(day) {
     return events.filter((event) =>
       isSameDay(day, parse(event.eventDate, "yyyy-MM-dd", new Date()))

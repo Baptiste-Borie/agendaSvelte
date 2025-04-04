@@ -29,6 +29,9 @@
     (new Date().getFullYear() - 100 + i).toString()
   );
 
+  /**
+   * Met à jour la date sélectionnée et ferme le modal
+   */
   function updateDate() {
     currentMonth = `${selectedMonth}-${selectedYear}`;
     updateDateParent(currentMonth);

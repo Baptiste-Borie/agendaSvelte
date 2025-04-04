@@ -14,24 +14,36 @@
     let isRegistering = false;
 
 
-    // Fonction pour hasher les mdp
+    /**
+     * Fonction pour hasher les mots de passe
+     * @param password
+     */
     async function hashPassword(password) {
         const salt = await bcrypt.genSalt(10);
         return await bcrypt.hash(password, salt);
     }
 
-    // Fonction pour comparer le mdp non hasher avec le hasher
+    /**
+     * Fonction pour comparer le mot de passe non hasher avec le hasher
+     * @param inputPassword mot de passe non hasher,
+     * @param hashedPassword mot de passe hasher
+     */
     async function comparePasswords(inputPassword, hashedPassword) {
         return await bcrypt.compare(inputPassword, hashedPassword);
     }
 
-    // Regex pour valider un email
+    /**
+     *  Regex pour valider un email
+     *  @param email
+     */
     function isValidEmail(email) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
     }
 
-    // Fonction pour gérer la connexion
+    /**
+     *  Login
+     */
     async function login() {
         if (!isValidEmail(email)) {
             error = 'Veuillez entrer une adresse email valide';
@@ -54,7 +66,9 @@
         }
     }
 
-    // Fonction pour gérer l'inscription, vérifie que l'user n'existe pas avant de le créer
+    /**
+     * Création d'un utilisateur et vérification de l'existance de cet utilisateur avant la création
+     */
     async function register() {
         if (!isValidEmail(email)) {
             error = 'Veuillez entrer une adresse email valide';
@@ -77,7 +91,9 @@
         }
     }
 
-    // Fonction pour déconnecter l'utilisateur
+    /**
+     * Logout
+     */
     function logout() {
         loggedInUser = null;
         username = '';
@@ -88,11 +104,13 @@
         onLogout();
     }
 
-    // Afficher tous les utilisateurs au chargement du composant (pour le débogage)
-    onMount(async () => {
-        const allUsers = await db.users.toArray();
-        console.log('Utilisateurs dans la base de données:', allUsers);
-    });
+    /**
+     * Permet l'affichage de la bdd dans la console
+     */
+    // onMount(async () => {
+    //     const allUsers = await db.users.toArray();
+    //     console.log('Utilisateurs dans la base de données:', allUsers);
+    // });
 </script>
 
 <main>
