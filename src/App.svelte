@@ -49,7 +49,9 @@
     fetchEvents();
   }
 
-  // Fonction pour gérer la déconnexion
+  /**
+   * Gère la déconnection de l'utilisateur
+   */
   function handleLogout() {
     loggedInUser = null;
     console.log("deco");
@@ -81,6 +83,12 @@
 
   $: startOfCurrentWeek = startOfWeek(currentDate, { weekStartsOn: 1 });
 
+  /**
+   * Gère le changement de saisie et bascule la vue en fonction du texte
+   * - "semaine" → active la vue semaine
+   * - "mois" → active la vue mois
+   * @param {Event} event - L'événement d'entrée contenant la valeur
+   */
   function handleInputChange(event) {
     const input = event.target.value.toLowerCase();
     if (input.includes("semaine")) {
@@ -90,12 +98,19 @@
     }
   }
 
+  /**
+   * Ferme la sidebar, réinitialise l'édition et nettoie les champs
+   */
   function handleSidebarClose() {
     isSidebarOpen = false;
     isEditing = false;
     clearAllFields();
   }
-  
+
+  /**
+   * Ferme la sidebar puis exécute l'action supplémentaire spécifiée
+   * @param {Function} action - Fonction à exécuter après la fermeture
+   */
   function handleButtonSidebarClose(action){
     handleSidebarClose();
     action();
@@ -110,6 +125,10 @@
     selectedEventId = null;
   }
 
+  /**
+   * Ouvre la sidebar en mode édition et pré-remplit les champs avec les données de l'événement
+   * @param {Object} event - L'événement à éditer contenant toutes ses propriétés
+   */
   function openEditSidebar(event) {
     isEditing = true;
     isSidebarOpen = true;
@@ -123,13 +142,26 @@
     selectedEventId = event.id;
   }
 
+  /**
+   * Gère le clic sur une cellule du calendrier :
+   * - Désactive le mode édition
+   * - Stocke la date sélectionnée
+   * - Ouvre la sidebar
+   * @param {Object} event - Contient la date cliquée (event.date)
+   */
   function handleCellClick(event) {
     isEditing = false;
     selectedDate = event.date;
     isSidebarOpen = true;
   }
 
-  function handleButtonCreateEvent(){
+  /**
+   * Prépare la création d'un nouvel événement :
+   * - Réinitialise la date sélectionnée si existante
+   * - Ouvre la sidebar en mode création
+   * - Nettoie tous les champs du formulaire
+   */
+   function handleButtonCreateEvent(){
     if(selectedDate != null){
       selectedDate = null;
     }
@@ -144,7 +176,10 @@
     currentMonth = date;
   }
 
-  async function fetchEvents() {
+  /**
+   * Récupère tous les événements depuis la base de données et met à jour le store
+   */
+   async function fetchEvents() {
     try {
       const eventsData = await db.events.toArray();
       events = eventsData;
