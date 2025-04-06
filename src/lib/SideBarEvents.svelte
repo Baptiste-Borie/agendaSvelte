@@ -47,11 +47,10 @@
    */
   async function handleSubmit() {
     try {
-      console.log("selectedTitle:", selectedTitle);
-      console.log("selectedDate:", selectedDate);
-
       if (!selectedTitle || !selectedDate) {
-        alert("Veuillez choisir au moins une date et un titre pour votre événement !");
+        alert(
+          "Veuillez choisir au moins une date et un titre pour votre événement !"
+        );
         return;
       }
 
@@ -59,7 +58,7 @@
         await db.events.update(selectedEventId, {
           eventName: selectedTitle,
           description: selectedDescription,
-          eventDate: selectedDate, 
+          eventDate: selectedDate,
           hour_start: selectedHourStart,
           hour_end: selectedHourEnd,
           color: selectedColor,
@@ -69,7 +68,7 @@
         await db.events.add({
           eventName: selectedTitle,
           description: selectedDescription,
-          eventDate: selectedDate, 
+          eventDate: selectedDate,
           hour_start: selectedHourStart,
           hour_end: selectedHourEnd,
           color: selectedColor,
@@ -79,8 +78,13 @@
       fetchEvents();
       closeSideBar();
     } catch (error) {
-      console.error("Erreur lors de la création/modification de l'événement :", error);
-      alert("Une erreur est survenue lors de la création/modification de l'événement.");
+      console.error(
+        "Erreur lors de la création/modification de l'événement :",
+        error
+      );
+      alert(
+        "Une erreur est survenue lors de la création/modification de l'événement."
+      );
     }
   }
 </script>
@@ -117,7 +121,7 @@
       <input
         type="date"
         id="event-date"
-        bind:value={selectedDate} 
+        bind:value={selectedDate}
         class="input-field"
         required
       />

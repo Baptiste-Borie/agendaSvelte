@@ -27,13 +27,10 @@
   let selectedDate = null;
   let selectedTitle = "";
   let selectedDescription = "";
-  let selectedHourStart = null; 
+  let selectedHourStart = null;
   let selectedHourEnd = null;
-  let selectedColor = null; 
+  let selectedColor = null;
   let selectedEventId = null;
-
-
-  
 
   $: currentMonth = format(currentDate, "MMMM-yyyy", { locale: fr });
 
@@ -54,7 +51,6 @@
    */
   function handleLogout() {
     loggedInUser = null;
-    console.log("deco");
     navigate("login");
   }
   function switchToMonthView() {
@@ -111,7 +107,7 @@
    * Ferme la sidebar puis exécute l'action supplémentaire spécifiée
    * @param {Function} action - Fonction à exécuter après la fermeture
    */
-  function handleButtonSidebarClose(action){
+  function handleButtonSidebarClose(action) {
     handleSidebarClose();
     action();
   }
@@ -132,9 +128,9 @@
   function openEditSidebar(event) {
     isEditing = true;
     isSidebarOpen = true;
-    
+
     selectedDate = event.date;
-    selectedTitle = event.eventName; 
+    selectedTitle = event.eventName;
     selectedDescription = event.description;
     selectedHourStart = event.hour_start;
     selectedHourEnd = event.hour_end;
@@ -161,8 +157,8 @@
    * - Ouvre la sidebar en mode création
    * - Nettoie tous les champs du formulaire
    */
-   function handleButtonCreateEvent(){
-    if(selectedDate != null){
+  function handleButtonCreateEvent() {
+    if (selectedDate != null) {
       selectedDate = null;
     }
     if (isSidebarOpen == false) {
@@ -179,7 +175,7 @@
   /**
    * Récupère tous les événements depuis la base de données et met à jour le store
    */
-   async function fetchEvents() {
+  async function fetchEvents() {
     try {
       const eventsData = await db.events.toArray();
       events = eventsData;
@@ -191,13 +187,17 @@
 
 <nav>
   {#if loggedInUser}
-    <button onclick={() => handleButtonSidebarClose(handleLogout)}>Déconnexion</button>
+    <button onclick={() => handleButtonSidebarClose(handleLogout)}
+      >Déconnexion</button
+    >
     {#if currentPage !== "profile"}
-      <button onclick={() => handleButtonCreateEvent() }
+      <button onclick={() => handleButtonCreateEvent()}
         >Créer un événement
       </button>
     {/if}
-    <button onclick={() => handleButtonSidebarClose(() => navigate("profile"))}>Modifier mon profil</button>
+    <button onclick={() => handleButtonSidebarClose(() => navigate("profile"))}
+      >Modifier mon profil</button
+    >
   {:else}
     <button onclick={() => navigate("login")}>Connexion</button>
   {/if}
@@ -242,31 +242,49 @@
 
     {#if currentView === "month"}
       {#key currentMonth}
-        <Month {currentMonth} {events} onCellClick={handleCellClick} onModalClick={openEditSidebar} {isEditing} clearAllFieldsProp={clearAllFields} {loggedInUser}/>
+        <Month
+          {currentMonth}
+          {events}
+          onCellClick={handleCellClick}
+          onModalClick={openEditSidebar}
+          {isEditing}
+          clearAllFieldsProp={clearAllFields}
+          {loggedInUser}
+          {fetchEvents}
+        />
       {/key}
     {:else if currentView === "week"}
       {#key startOfCurrentWeek}
-        <Week {startOfCurrentWeek} {events} onCellClick={handleCellClick} onModalClick={openEditSidebar} {isEditing} clearAllFieldsProp={clearAllFields} {loggedInUser}/>
+        <Week
+          {startOfCurrentWeek}
+          {events}
+          onCellClick={handleCellClick}
+          onModalClick={openEditSidebar}
+          {isEditing}
+          clearAllFieldsProp={clearAllFields}
+          {loggedInUser}
+          {fetchEvents}
+        />
       {/key}
     {/if}
   {:else if currentPage === "profile"}
     <Profile {loggedInUser} />
   {/if}
   {#key loggedInUser}
-  <SideBarEvents
-    bind:isOpen={isSidebarOpen}
-    {fetchEvents}
-    {loggedInUser}
-    onClose={handleSidebarClose}
-    {selectedDate}
-    {isEditing}
-    {selectedTitle}
-    {selectedDescription}
-    {selectedHourStart}
-    {selectedHourEnd}
-    {selectedColor}
-    {selectedEventId}
-  />
+    <SideBarEvents
+      bind:isOpen={isSidebarOpen}
+      {fetchEvents}
+      {loggedInUser}
+      onClose={handleSidebarClose}
+      {selectedDate}
+      {isEditing}
+      {selectedTitle}
+      {selectedDescription}
+      {selectedHourStart}
+      {selectedHourEnd}
+      {selectedColor}
+      {selectedEventId}
+    />
   {/key}
 </main>
 

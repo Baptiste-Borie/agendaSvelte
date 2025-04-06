@@ -1,6 +1,6 @@
 <script>
   import { format } from "date-fns";
-  import db from './db.js';
+  import db from "./db.js";
 
   export let loggedInUser;
   export let date;
@@ -8,7 +8,9 @@
   export let view;
   export let events = [];
   export let onCellClick;
+  export let fetchEvents;
   export let onModalClick;
+
   // export let isEditing;
   export let clearAllFieldsProp;
   let isModalOpen = false;
@@ -24,11 +26,10 @@
 
   const isWeekView = view === "Week";
 
-  // code deepseek: il ajoute la propriété date à event au moment où on ouvre la modal,
-  // parce que sinon lorsqu'on modifie un event on récupére pas la date
-  // obliger de passer par cette fonction pour modifier un event pour l'instant
-  // parce que on peut pas modifier un event autrement. Donc j'ajoute la propriété date ici, mais du coup c'est pas optimal. Mais ça fonctionne.
-
+  // Ajout de la propriété "date" à l'objet "event" lors de l'ouverture de la modal.
+  // Sans cela, la date de l'événement n'est pas disponible lors de la modification.
+  // Actuellement, la modification d'un événement passe obligatoirement par cette fonction,
+  // car il n'existe pas d'autre mécanisme pour l'éditer.
 
   /**
    * Ouvre un modal et prépare l'événement sélectionné pour l'affichage
@@ -38,11 +39,10 @@
    */
   const openModal = (event) => {
     selectedEvent = {
-    ...event,
-    date: format(event.eventDate, "yyyy-MM-dd"),
-  };
+      ...event,
+      date: format(event.eventDate, "yyyy-MM-dd"),
+    };
 
-  console.log(date)
     isModalOpen = true;
   };
 
@@ -73,7 +73,7 @@
    */
   function handleClick() {
     const formattedDate = format(date, "yyyy-MM-dd");
-    onCellClick({ date:formattedDate });
+    onCellClick({ date: formattedDate });
   }
 
   /**
@@ -82,7 +82,7 @@
    * @returns {void}
    *
    */
-   function handleKeydown(event) {
+  function handleKeydown(event) {
     if (event.key === "Enter" || event.key === " ") {
       handleClick();
     }
@@ -104,7 +104,8 @@
   async function deleteEvent() {
     try {
       await db.events.delete(eventIdToDelete);
-      events = events.filter(event => event.id !== eventIdToDelete);
+      events = events.filter((event) => event.id !== eventIdToDelete);
+      fetchEvents();
       closeModal();
       isConfirmModalOpen = false;
     } catch (err) {
@@ -113,7 +114,16 @@
   }
 </script>
 
-<div class={"cellule " + (isWeekView ? "week" : "month")} onclick={() => { handleClick(); clearAllFieldsProp(); }} onkeydown={handleKeydown} tabindex="0" role="button">
+<div
+  class={"cellule " + (isWeekView ? "week" : "month")}
+  onclick={() => {
+    handleClick();
+    clearAllFieldsProp();
+  }}
+  onkeydown={handleKeydown}
+  tabindex="0"
+  role="button"
+>
   {#if date}
     <span class={isToday(date) ? "today" : ""}>{date.getDate()}</span>
   {/if}
@@ -123,9 +133,9 @@
       {#each events as event}
         {#if loggedInUser.id === event.userId}
           <button
-                  class="event"
-                  style="background-color: {event.color}"
-                  onclick={(e) => {
+            class="event"
+            style="background-color: {event.color}"
+            onclick={(e) => {
               e.stopPropagation();
               openModal(event);
               // onModalClick(event);
@@ -133,7 +143,7 @@
           >
             <strong>{event.hour_start}</strong> - {event.eventName}
           </button>
-          {/if}
+        {/if}
       {/each}
     </div>
   {/if}
@@ -158,7 +168,8 @@
           onclick={() => {
             onModalClick(selectedEvent);
             closeModal();
-          }}>Modifier</button>
+          }}>Modifier</button
+        >
         <button class="btn-red" onclick={() => confirmDelete(selectedEvent.id)}>
           Supprimer
         </button>
@@ -173,12 +184,8 @@
       <h2>Confirmer la suppression</h2>
       <p>Êtes-vous sûr de vouloir supprimer cet événement ?</p>
       <div>
-        <button class="btn-red" onclick={deleteEvent}>
-          Oui, supprimer
-        </button>
-        <button onclick={() => isConfirmModalOpen = false}>
-          Annuler
-        </button>
+        <button class="btn-red" onclick={deleteEvent}> Oui, supprimer </button>
+        <button onclick={() => (isConfirmModalOpen = false)}> Annuler </button>
       </div>
     </div>
   </div>

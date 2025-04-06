@@ -5,9 +5,10 @@
   export let loggedInUser;
   export let startOfCurrentWeek;
   export let events = [];
+  export let fetchEvents;
   export let onCellClick;
   export let onModalClick;
-  export let isEditing; 
+  export let isEditing;
   export let clearAllFieldsProp;
 
   let days = Array.from({ length: 7 }, (_, i) =>
@@ -34,7 +35,17 @@
     <div class="header">{head}</div>
   {/each}
   {#each days as day}
-    <Cellule date={day} {today} view={"Week"} events={getEventsForDay(day)} onCellClick={onCellClick} onModalClick = {onModalClick} {clearAllFieldsProp} {loggedInUser} />
+    <Cellule
+      date={day}
+      {today}
+      view={"Week"}
+      events={getEventsForDay(day)}
+      {onCellClick}
+      {onModalClick}
+      {clearAllFieldsProp}
+      {loggedInUser}
+      {fetchEvents}
+    />
   {/each}
 </div>
 

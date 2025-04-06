@@ -12,6 +12,7 @@
   export let loggedInUser;
   export let currentMonth;
   export let events = [];
+  export let fetchEvents;
   export let onCellClick;
   export let onModalClick;
   export let isEditing;
@@ -45,7 +46,17 @@
     <div class="header">{head}</div>
   {/each}
   {#each days as day}
-    <Cellule date={day} {today} view={"Month"} events={getEventsForDay(day)} onCellClick={onCellClick} onModalClick = {onModalClick}  {clearAllFieldsProp} {loggedInUser}/>
+    <Cellule
+      date={day}
+      {today}
+      view={"Month"}
+      events={getEventsForDay(day)}
+      {onCellClick}
+      {onModalClick}
+      {clearAllFieldsProp}
+      {loggedInUser}
+      {fetchEvents}
+    />
   {/each}
 </div>
 

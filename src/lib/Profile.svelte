@@ -16,7 +16,6 @@
    */
   onMount(() => {
     if (loggedInUser) {
-      console.log(loggedInUser.id);
       username = loggedInUser.username;
       email = loggedInUser.email;
     }
